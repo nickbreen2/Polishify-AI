@@ -15,7 +15,7 @@
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
   width: 420px;
-  max-height: 400px;
+  max-height: 500px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -189,6 +189,51 @@
   border-color: #16a34a;
 }
 
+/* Grade */
+.polishify-grade {
+  padding: 8px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.polishify-grade-overall {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.polishify-tier {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.polishify-tier-excellent {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.polishify-tier-good {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.polishify-tier-needs-work {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.polishify-grade-feedback {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 2px 0;
+  line-height: 1.4;
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   .polishify-popover {
@@ -236,5 +281,17 @@
   .polishify-btn:hover {
     background: #333;
     border-color: #555;
+  }
+
+  .polishify-grade {
+    border-top-color: #2a2a2a;
+  }
+
+  .polishify-grade-overall {
+    color: #d1d5db;
+  }
+
+  .polishify-grade-feedback {
+    color: #9ca3af;
   }
 }

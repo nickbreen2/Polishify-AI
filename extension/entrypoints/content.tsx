@@ -5,6 +5,8 @@ import type {
   PolishRequest,
   PolishResponse,
   PolishError,
+  GradeResult,
+  PolishMode,
 } from "@/lib/types";
 import popoverStyles from "@/components/popover.css?raw";
 
@@ -71,6 +73,8 @@ export default defineContentScript({
     function renderPopover(
       text: string,
       improvedText: string | null,
+      detectedMode: PolishMode | null,
+      grade: GradeResult | null,
       error: string | null,
       loading: boolean,
       pos: { top: number; left: number }
@@ -106,6 +110,8 @@ export default defineContentScript({
         <Popover
           originalText={text}
           improvedText={improvedText}
+          detectedMode={detectedMode}
+          grade={grade}
           error={error}
           loading={loading}
           onReplace={replaceText}
@@ -128,7 +134,7 @@ export default defineContentScript({
       activeElement = document.activeElement;
 
       // Show loading state
-      renderPopover(text, null, null, true, pos);
+      renderPopover(text, null, null, null, null, true, pos);
 
       // Send request through background worker
       try {
@@ -138,13 +144,15 @@ export default defineContentScript({
         } satisfies PolishRequest)) as PolishResponse | PolishError;
 
         if (response.type === "POLISH_ERROR") {
-          renderPopover(text, null, response.error, false, pos);
+          renderPopover(text, null, null, null, response.error, false, pos);
         } else {
-          renderPopover(text, response.improvedText, null, false, pos);
+          renderPopover(text, response.improvedText, response.detectedMode, response.grade, null, false, pos);
         }
       } catch (err) {
         renderPopover(
           text,
+          null,
+          null,
           null,
           err instanceof Error ? err.message : "Something went wrong",
           false,

@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     mode?: string;
     polishedText?: string;
     answers?: unknown;
+    grade?: unknown;
   };
   try {
     body = await request.json();
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
     const result = await improveWithContext(text, selectedMode, {
       polishedText: polished,
       answers: answersList,
+      grade: body.grade as import("@/lib/anthropic").GradeResult | undefined,
     });
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },

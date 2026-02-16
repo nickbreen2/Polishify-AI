@@ -4,7 +4,6 @@ import {
   improveWithContext,
 } from "@/lib/api";
 import type {
-  PolishMode,
   PolishRequest,
   PolishResponse,
   PolishError,
@@ -75,15 +74,13 @@ export default defineBackground(() => {
     ) => {
       if (message.type === "POLISH_REQUEST") {
         (async () => {
-          const mode =
-            ((await browser.storage.local.get("mode")).mode as PolishMode) ??
-            "general";
-
           try {
-            const result = await polishText(message.text, mode);
+            const result = await polishText(message.text);
             sendResponse({
               type: "POLISH_RESPONSE",
-              improvedText: result.improvedText,
+              improvedText: result.polishedText,
+              detectedMode: result.detectedMode,
+              grade: result.grade,
             });
           } catch (err) {
             sendResponse({
@@ -100,7 +97,9 @@ export default defineBackground(() => {
           try {
             const result = await getClarifyingQuestions(
               message.text,
-              message.polishedText
+              message.polishedText,
+              message.detectedMode,
+              message.grade
             );
             sendResponse({
               type: "CLARIFY_RESPONSE",
@@ -123,11 +122,13 @@ export default defineBackground(() => {
               message.text,
               message.mode,
               message.answers,
-              message.polishedText
+              message.polishedText,
+              message.grade
             );
             sendResponse({
               type: "IMPROVE_RESPONSE",
               improvedText: result.improvedText,
+              grade: result.grade,
             });
           } catch (err) {
             sendResponse({

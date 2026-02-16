@@ -1,8 +1,11 @@
 import { useState } from "react";
+import type { GradeResult } from "@/lib/types";
 
 interface PopoverProps {
   originalText: string;
   improvedText: string | null;
+  detectedMode: "prompt" | "general" | null;
+  grade: GradeResult | null;
   error: string | null;
   loading: boolean;
   onReplace: (text: string) => void;
@@ -12,6 +15,7 @@ interface PopoverProps {
 export function Popover({
   originalText,
   improvedText,
+  grade,
   error,
   loading,
   onReplace,
@@ -79,6 +83,21 @@ export function Popover({
               {tab === "improved" ? improvedText : originalText}
             </div>
           </div>
+
+          {/* Grade */}
+          {grade && (
+            <div className="polishify-grade">
+              <div className="polishify-grade-overall">
+                <span>Grade</span>
+                <span className={`polishify-tier polishify-tier-${grade.overall.toLowerCase().replace(" ", "-")}`}>
+                  {grade.overall}
+                </span>
+              </div>
+              {grade.feedback.slice(0, 2).map((f, i) => (
+                <p key={i} className="polishify-grade-feedback">{f}</p>
+              ))}
+            </div>
+          )}
 
           {/* Footer */}
           <div className="polishify-footer">

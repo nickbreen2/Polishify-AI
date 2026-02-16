@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { text?: string; mode?: string };
+  let body: { text?: string };
   try {
     body = await request.json();
   } catch {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { text, mode } = body;
+  const { text } = body;
 
   if (!text || typeof text !== "string" || text.trim().length === 0) {
     return NextResponse.json(
@@ -44,13 +44,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const validModes = ["general", "prompt"] as const;
-  const selectedMode = validModes.includes(mode as (typeof validModes)[number])
-    ? (mode as (typeof validModes)[number])
-    : "general";
-
   try {
-    const result = await rewrite(text, selectedMode);
+    const result = await rewrite(text);
 
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },

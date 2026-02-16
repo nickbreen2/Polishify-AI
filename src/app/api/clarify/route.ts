@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { text?: string; polishedText?: string };
+  let body: { text?: string; polishedText?: string; detectedMode?: string; grade?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { text, polishedText } = body;
+  const { text, polishedText, detectedMode, grade } = body;
 
   if (!text || typeof text !== "string" || text.trim().length === 0) {
     return NextResponse.json(
@@ -55,7 +55,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await getClarifyingQuestions(text, polished);
+    const normalizedMode = detectedMode === "prompt" ? "prompt" as const : "general" as const;
+    const result = await getClarifyingQuestions(text, polished, normalizedMode, grade as import("@/lib/anthropic").GradeResult | undefined);
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },
     });

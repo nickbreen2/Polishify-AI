@@ -1,14 +1,24 @@
 export type PolishMode = "general" | "prompt";
 
+export type GradeTier = "Excellent" | "Good" | "Needs Work";
+
+export interface GradeResult {
+  overall: GradeTier;
+  dimensions: Record<string, GradeTier>;
+  feedback: string[];
+}
+
 export interface PolishRequest {
   type: "POLISH_REQUEST";
   text: string;
-  mode: PolishMode;
+  mode?: PolishMode;
 }
 
 export interface PolishResponse {
   type: "POLISH_RESPONSE";
   improvedText: string;
+  detectedMode: PolishMode;
+  grade: GradeResult;
 }
 
 export interface PolishError {
@@ -30,6 +40,8 @@ export interface ClarifyRequest {
   type: "CLARIFY_REQUEST";
   text: string;
   polishedText?: string;
+  detectedMode?: PolishMode;
+  grade?: GradeResult;
 }
 
 export interface ClarifyResponse {
@@ -48,11 +60,13 @@ export interface ImproveRequest {
   mode: PolishMode;
   polishedText?: string;
   answers: string[];
+  grade?: GradeResult;
 }
 
 export interface ImproveResponse {
   type: "IMPROVE_RESPONSE";
   improvedText: string;
+  grade: GradeResult;
 }
 
 export interface ImproveError {

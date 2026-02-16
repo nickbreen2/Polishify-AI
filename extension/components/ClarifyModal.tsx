@@ -32,9 +32,16 @@ export function ClarifyModal({
   const current = questions[currentIndex];
   const total = questions.length;
   const isLast = currentIndex === total - 1;
+  // If selectedAnswer is a non-empty string, use that (user picked an option).
+  // If selectedAnswer is "" (cleared by typing), use the text input.
+  // If selectedAnswer is null, fall back to text input.
   const currentAnswer =
-    selectedAnswer ?? (current.allowOther ? otherInput.trim() : "") ?? "";
-  const canSubmit = selectedAnswer !== null || (current.allowOther && otherInput.trim() !== "");
+    selectedAnswer
+      ? selectedAnswer
+      : current.allowOther && otherInput.trim()
+        ? otherInput.trim()
+        : "";
+  const canSubmit = currentAnswer !== "";
   const handleNext = () => onNext(currentAnswer);
 
   return (
@@ -90,13 +97,40 @@ export function ClarifyModal({
       {/* Options */}
       <div className="flex-1 min-h-0 flex flex-col px-4 pb-4">
         <div className="space-y-1">
+          {current.allowOther && (
+            <div className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 mb-2 ${
+              otherInput.trim() && !selectedAnswer
+                ? "border-[#456BFF] bg-[#eff2ff]"
+                : "border-gray-200 bg-white"
+            }`}>
+              <span className="text-gray-400" aria-hidden>
+                ✎
+              </span>
+              <input
+                type="text"
+                value={otherInput}
+                onChange={(e) => {
+                  onOtherInputChange(e.target.value);
+                  if (e.target.value.trim()) onSelectOption("");
+                }}
+                onFocus={() => { if (otherInput.trim()) onSelectOption(""); }}
+                placeholder="Type your answer..."
+                className="min-w-0 flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+                aria-label="Type your answer"
+              />
+            </div>
+          )}
+
           {current.options.map((option, i) => {
             const isSelected = selectedAnswer === option;
             return (
               <button
                 key={i}
                 type="button"
-                onClick={() => onSelectOption(option)}
+                onClick={() => {
+                  onSelectOption(option);
+                  onOtherInputChange("");
+                }}
                 className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
                   isSelected
                     ? "border-[#456BFF] bg-[#eff2ff] text-gray-900"
@@ -121,22 +155,6 @@ export function ClarifyModal({
               </button>
             );
           })}
-
-          {current.allowOther && (
-            <div className="mt-2 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-              <span className="text-gray-400" aria-hidden>
-                ✎
-              </span>
-              <input
-                type="text"
-                value={otherInput}
-                onChange={(e) => onOtherInputChange(e.target.value)}
-                placeholder="Something else"
-                className="min-w-0 flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
-                aria-label="Something else"
-              />
-            </div>
-          )}
         </div>
 
         <div className="mt-4 flex justify-end gap-2 shrink-0">
