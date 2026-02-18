@@ -49,10 +49,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const validModes = ["general", "prompt"] as const;
+  const validModes = ["prompt", "professional", "creative", "casual"] as const;
   const selectedMode = validModes.includes(mode as (typeof validModes)[number])
     ? (mode as (typeof validModes)[number])
-    : "general";
+    : "professional";
 
   const answersList = Array.isArray(answers)
     ? (answers as unknown[]).filter((a) => typeof a === "string")

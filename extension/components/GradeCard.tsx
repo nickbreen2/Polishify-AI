@@ -1,7 +1,7 @@
 import type { GradeTier, GradeResult } from "@/lib/types";
 
-const PROMPT_DIMENSIONS = ["Clarity", "Specificity", "Structure", "Conciseness", "Task Definition"];
-const WRITING_DIMENSIONS = ["Grammar", "Clarity", "Tone", "Structure", "Word Choice"];
+const PROMPT_DIMENSIONS = ["Clarity", "Structure", "Tone", "Voice", "Completeness", "Conciseness", "Prompt Specificity"];
+const WRITING_DIMENSIONS = ["Clarity", "Structure", "Tone", "Voice", "Completeness", "Conciseness"];
 
 const tierColors: Record<GradeTier, string> = {
   "Excellent": "bg-green-100 text-green-800",
@@ -11,7 +11,7 @@ const tierColors: Record<GradeTier, string> = {
 
 interface GradeCardProps {
   grade: GradeResult;
-  detectedMode: "prompt" | "general";
+  detectedMode: "prompt" | "professional" | "creative" | "casual";
 }
 
 export function GradeCard({ grade, detectedMode }: GradeCardProps) {

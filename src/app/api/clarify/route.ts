@@ -55,7 +55,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const normalizedMode = detectedMode === "prompt" ? "prompt" as const : "general" as const;
+    const validModes = ["prompt", "professional", "creative", "casual"] as const;
+    type ValidMode = (typeof validModes)[number];
+    const normalizedMode: ValidMode = validModes.includes(detectedMode as ValidMode)
+      ? (detectedMode as ValidMode)
+      : "professional";
     const result = await getClarifyingQuestions(text, polished, normalizedMode, grade as import("@/lib/anthropic").GradeResult | undefined);
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },

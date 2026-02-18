@@ -1,4 +1,4 @@
-export type PolishMode = "general" | "prompt";
+export type PolishMode = "prompt" | "professional" | "creative" | "casual";
 
 export type GradeTier = "Excellent" | "Good" | "Needs Work";
 

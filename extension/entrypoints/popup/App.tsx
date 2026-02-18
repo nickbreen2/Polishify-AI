@@ -13,6 +13,21 @@ import type {
   GradeResult,
 } from "@/lib/types";
 
+/** Client-side heuristic: single-word input with very few vowels is likely gibberish. */
+function looksLikeGibberish(text: string): boolean {
+  const t = text.trim();
+  if (t.length < 4) return false;
+  const words = t.split(/\s+/);
+  if (words.length === 1) {
+    const word = words[0];
+    const vowels = (word.match(/[aeiouyAEIOUY]/g) || []).length;
+    const vowelRatio = vowels / word.length;
+    if (word.length >= 5 && vowelRatio < 0.2) return true;
+    if (word.length >= 4 && vowels === 0) return true;
+  }
+  return false;
+}
+
 export default function App() {
   const [inputText, setInputText] = useState("");
   const [polishedText, setPolishedText] = useState<string | null>(null);
@@ -42,6 +57,11 @@ export default function App() {
   const runPolish = async () => {
     const text = inputText.trim();
     if (!text || loading) return;
+
+    if (looksLikeGibberish(text)) {
+      setError("Please enter real writing or a prompt, not random characters.");
+      return;
+    }
 
     setError(null);
     setPolishedText(null);
@@ -283,6 +303,12 @@ export default function App() {
                 <textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      runPolish();
+                    }
+                  }}
                   placeholder="Paste your writing here..."
                   className="w-full min-h-[120px] px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-gray-300 resize-y mb-4"
                   disabled={loading}
