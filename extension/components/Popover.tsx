@@ -37,13 +37,11 @@ export function Popover({
       <div className="polishify-header">
         <span className="polishify-title">
           <img
-            src={browser.runtime.getURL("/logo.png")}
+            src={browser.runtime.getURL("/full-logo.svg")}
             alt=""
-            width={16}
-            height={16}
-            style={{ display: "block", flexShrink: 0 }}
+            className="h-5 w-auto max-w-[120px] shrink-0"
+            style={{ display: "block" }}
           />
-          Polishify AI
         </span>
         <button className="polishify-close" onClick={onDismiss}>
           ×

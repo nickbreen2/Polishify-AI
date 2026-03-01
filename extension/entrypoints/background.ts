@@ -75,7 +75,7 @@ export default defineBackground(() => {
       if (message.type === "POLISH_REQUEST") {
         (async () => {
           try {
-            const result = await polishText(message.text);
+            const result = await polishText(message.text, message.style);
             sendResponse({
               type: "POLISH_RESPONSE",
               improvedText: result.polishedText,

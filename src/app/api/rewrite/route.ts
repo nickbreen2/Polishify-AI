@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { text?: string };
+  let body: { text?: string; style?: string };
   try {
     body = await request.json();
   } catch {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { text } = body;
+  const { text, style } = body;
 
   if (!text || typeof text !== "string" || text.trim().length === 0) {
     return NextResponse.json(
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await rewrite(text);
+    const result = await rewrite(text, style);
 
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },
