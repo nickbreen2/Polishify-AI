@@ -354,7 +354,7 @@ export function PolishDemo() {
             ) : (
               <>
                 <img src="/sparks-solid.svg" alt="" width={18} height={18} className="w-[18px] h-[18px] shrink-0" />
-                Polish
+                Polishify
               </>
             )}
           </button>
