@@ -1,28 +1,21 @@
-const windowMs = 60_000; // 1 minute
-const maxRequests = 10;
+const store = new Map<string, { count: number; resetAt: number }>();
 
-const hits = new Map<string, number[]>();
+const MAX_REQUESTS = 10;
+const WINDOW_MS = 60_000;
 
-// Clean up stale entries every 5 minutes
-setInterval(() => {
+export function rateLimit(key: string): { ok: boolean; remaining: number } {
   const now = Date.now();
-  for (const [key, timestamps] of hits) {
-    const valid = timestamps.filter((t) => now - t < windowMs);
-    if (valid.length === 0) hits.delete(key);
-    else hits.set(key, valid);
+  const entry = store.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    store.set(key, { count: 1, resetAt: now + WINDOW_MS });
+    return { ok: true, remaining: MAX_REQUESTS - 1 };
   }
-}, 5 * 60_000);
 
-export function rateLimit(ip: string): { ok: boolean; remaining: number } {
-  const now = Date.now();
-  const timestamps = (hits.get(ip) ?? []).filter((t) => now - t < windowMs);
-
-  if (timestamps.length >= maxRequests) {
-    hits.set(ip, timestamps);
+  if (entry.count >= MAX_REQUESTS) {
     return { ok: false, remaining: 0 };
   }
 
-  timestamps.push(now);
-  hits.set(ip, timestamps);
-  return { ok: true, remaining: maxRequests - timestamps.length };
+  entry.count++;
+  return { ok: true, remaining: MAX_REQUESTS - entry.count };
 }

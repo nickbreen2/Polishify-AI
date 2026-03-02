@@ -1,78 +1,59 @@
+import { Navbar } from "@/components/Navbar";
+import { PolishDemo } from "@/components/PolishDemo";
+import { FloatingIcons } from "@/components/FloatingIcons";
+
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-12 px-8 py-20">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Polishify.AI logo" width={48} height={48} />
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Polishify<span className="text-purple-700 dark:text-purple-400">.AI</span>
-          </h1>
-        </div>
+    <div className="relative bg-zinc-50 font-sans dark:bg-black">
+      {/* Grid background */}
+      <div className="bg-grid pointer-events-none absolute inset-0" />
 
-        {/* Tagline */}
-        <p className="max-w-md text-center text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          Select any text on the web. Polish it with AI. Replace it in-place.
-        </p>
+      {/* All content in a single z-[1] wrapper — guarantees it's above the grid */}
+      <div className="relative z-[1] flex min-h-screen flex-col">
+        <Navbar />
 
-        {/* How it works */}
-        <div className="grid w-full gap-6 sm:grid-cols-3">
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
-            <span className="text-2xl">1</span>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Select text
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Highlight any text in a text field on the web.
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
-            <span className="text-2xl">2</span>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Press ⌘⇧O
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Or right-click and choose &ldquo;Polish with AI&rdquo;.
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
-            <span className="text-2xl">3</span>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Replace
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Review the improved text and replace it with one click.
-            </p>
-          </div>
-        </div>
+        {/* Spacer for fixed nav */}
+        <div className="h-[57px]" />
 
-        {/* Modes */}
-        <div className="flex w-full flex-col gap-4 sm:flex-row">
-          <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-2 text-sm font-semibold text-purple-700 dark:text-purple-400">
-              General Writing
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Improve clarity, grammar, tone, and conciseness for emails,
-              docs, messages, and more.
-            </p>
-          </div>
-          <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h3 className="mb-2 text-sm font-semibold text-purple-700 dark:text-purple-400">
-              Prompt Engineering
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Turn rough instructions into clear, structured prompts that
-              get better results from AI models.
-            </p>
-          </div>
-        </div>
+        <main className="flex flex-1 flex-col items-center px-8">
 
-        {/* CTA */}
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-sm text-zinc-400">Chrome extension — free &amp; open source</p>
-        </div>
-      </main>
+          {/* Hero + Demo */}
+          <section id="polish" className="relative flex w-full flex-col items-center gap-8 pb-24 pt-10 sm:pt-20">
+            <FloatingIcons />
+
+            {/* Content constrained to max-w-2xl, above floating icons */}
+            <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-8">
+              <div className="flex flex-col items-center gap-4 text-center">
+                {/* Badge */}
+                <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-600 shadow-[0_2px_16px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-zinc-300 dark:shadow-[0_2px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-heartbeat absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                  </span>
+                  AI-Powered Refinement
+                </div>
+
+                <h1 className="text-3xl font-bold leading-tight tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
+                  Polish it<br />Before you send it.
+                </h1>
+                <p className="max-w-md text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
+                  Select any text on the web, polish it with AI, and replace it in-place.
+                </p>
+              </div>
+              <PolishDemo />
+            </div>
+          </section>
+
+        </main>
+
+        {/* Footer */}
+        <footer className="w-full border-t border-zinc-200 dark:border-zinc-800">
+          <div className="mx-auto max-w-2xl px-8 py-8 text-center text-sm text-zinc-400">
+            Chrome extension — free &amp; open source
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

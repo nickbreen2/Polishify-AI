@@ -1,14 +1,16 @@
-import type { PolishMode, ClarifyingQuestion, GradeResult } from "./types";
+import type { PolishMode, ClarifyingQuestion, GradeResult, OutputStyle } from "./types";
 
+// TODO: change to production URL before shipping to Chrome Web Store
 const API_BASE = "http://localhost:3000/api";
 
 export async function polishText(
-  text: string
+  text: string,
+  style?: OutputStyle
 ): Promise<{ polishedText: string; detectedMode: PolishMode; grade: GradeResult }> {
   const res = await fetch(`${API_BASE}/rewrite`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, style }),
   });
 
   if (!res.ok) {

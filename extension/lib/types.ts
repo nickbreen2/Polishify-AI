@@ -1,5 +1,7 @@
 export type PolishMode = "prompt" | "professional" | "creative" | "casual";
 
+export type OutputStyle = "Detailed" | "Concise" | "Structured" | "Creative";
+
 export type GradeTier = "Excellent" | "Good" | "Needs Work";
 
 export interface GradeResult {
@@ -12,6 +14,7 @@ export interface PolishRequest {
   type: "POLISH_REQUEST";
   text: string;
   mode?: PolishMode;
+  style?: OutputStyle;
 }
 
 export interface PolishResponse {

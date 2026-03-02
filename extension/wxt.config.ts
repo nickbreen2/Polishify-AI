@@ -2,6 +2,11 @@ import { defineConfig } from "wxt";
 
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
+  vite: () => ({
+    server: {
+      port: 3001,
+    },
+  }),
   manifest: {
     name: "Polishify AI",
     description: "Select text, polish it with AI, replace it in-place.",

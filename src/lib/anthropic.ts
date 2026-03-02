@@ -6,9 +6,17 @@ const client = new Anthropic();
 const GOOD_PROMPT_PRINCIPLES = `A good prompt has: clear role + task + minimal necessary constraints; concise; no redundant or over-specified instructions. Over-long or over-detailed prompts cause downstream models to hallucinate — so conciseness and structure matter more than adding detail.`;
 const GOOD_WRITING_PRINCIPLES = `Good writing is: clear, concise, no fluff. Verbosity and filler should be trimmed.`;
 
+// Output style modifiers (appended to the system prompt when a non-default style is selected)
+const STYLE_INSTRUCTIONS: Record<string, string> = {
+  Detailed: "",
+  Concise: "\n\nOUTPUT STYLE — Concise: Be as brief as possible while preserving all key meaning. Cut aggressively — trim filler, redundancies, and unnecessary elaboration. The output should be noticeably shorter than a default rewrite.",
+  Structured: "\n\nOUTPUT STYLE — Structured: Organize the output with clear, logical structure. For writing modes, use headers or bullet points where they add clarity. For prompt mode, the XML tag format already fulfils this — apply it strictly.",
+  Creative: "\n\nOUTPUT STYLE — Creative: Use engaging, expressive language. Aim for memorable, interesting phrasing while keeping the meaning clear. Avoid generic corporate or template-sounding language.",
+};
+
 // Mode-specific system prompts for the improve step
 const SYSTEM_PROMPTS: Record<string, string> = {
-  prompt: `You are an AI prompt engineer. The user will give you a rough prompt or instruction they want to send to an AI. Rewrite it into a clear, well-structured prompt that will get better results. Return ONLY the improved prompt — no preamble, no quotes, no explanation. Preserve the user's intent and specific details. Do not execute the prompt — output only an improved version of the instruction itself. Do not add placeholders like [name] or [date] that weren't in the original. ${GOOD_PROMPT_PRINCIPLES} Keep the prompt concise; prefer clear structure over adding detail.`,
+  prompt: `You are an AI prompt engineer. The user will give you a rough prompt or instruction they want to send to an AI. Rewrite it into a clear, well-structured prompt using XML-style tags. Use only the tags that meaningfully apply:\n<Context>Background situation or information the AI needs</Context>\n<Request>The specific task or action requested from the AI</Request>\n<Explanation>Key constraints, requirements, tone, format, or audience details</Explanation>\n<Outcome>Expected format and quality of the AI's output</Outcome>\nAlways include at least <Context> and <Request>. Return ONLY the structured prompt — no preamble, no quotes, no explanation. Do not execute the prompt — output only an improved version of the instruction itself. Do not add placeholders like [name] or [date] that weren't in the original. ${GOOD_PROMPT_PRINCIPLES}`,
   professional: `You are a professional writing assistant. The user will give you work or business writing they want polished. Improve it for clarity, tone, and conciseness while preserving their authentic voice. Return ONLY the improved text — no preamble, no quotes, no explanation. Keep it sounding like the person, not a corporate template. Calibrate tone to the audience and relationship. One clear point or ask, no filler. ${GOOD_WRITING_PRINCIPLES}`,
   creative: `You are a creative writing assistant. The user will give you creative or narrative writing to polish. Improve grammar, flow, and structure while heavily preserving their voice and style. Return ONLY the improved text — no preamble, no quotes, no explanation. Do not sterilize the writing or strip the personality. ${GOOD_WRITING_PRINCIPLES}`,
   casual: `You are a writing assistant. The user will give you casual writing to improve. Make minimal changes — fix obvious errors but preserve their natural tone, style, and phrasing completely. Return ONLY the improved text — no preamble, no quotes, no explanation. ${GOOD_WRITING_PRINCIPLES}`,
@@ -21,17 +29,39 @@ const REWRITE_SYSTEM = `You are Polishify AI — a writing and prompt-engineerin
 
 STEP 1 — CLASSIFY MODE
 Classify the input into exactly one of these modes:
-- "prompt": An instruction or request the user intends to send to an AI model. Examples: "Write me an email about...", "Generate a summary of...", "Create a blog post about...", "Help me draft...", "Make a formal letter...". If the text is ASKING an AI to create/generate/write/draft/make something, it is a prompt — even if phrased casually.
-- "professional": Actual written content for work or business purposes — emails, messages, reports, proposals, LinkedIn posts, cover letters, meeting notes. The text IS the content itself, not a request to create it.
+- "prompt": An IMPERATIVE COMMAND the user intends to send to an AI model — the text is an instruction telling an AI what to produce. Examples: "Write me an email about...", "Generate a summary of...", "Create a blog post about...", "Draft a cover letter for...", "Make a formal message to...". The defining signal is the imperative/command form directed at an AI.
+- "professional": Actual written content for work or business purposes — emails, messages, reports, proposals, LinkedIn posts, cover letters, meeting notes. The text IS the content itself (even if rough or incomplete), not a command to produce it.
 - "creative": Stories, scripts, poems, personal essays, fictional or narrative content.
 - "casual": Social media posts, texts, informal messages, personal notes, chat messages.
 
-Key distinction: If the text says "write", "create", "generate", "draft", "make" followed by a description of desired output → it is a "prompt". If the text IS the output itself → classify by content type (professional, creative, or casual).
+Key distinction — CRITICAL:
+The central question: does the text CONTAIN the actual writing, or does it DESCRIBE/INSTRUCT what should be written?
+
+PROMPT mode — the text is instructions or a description for an AI to act on:
+- Imperative commands: "Write me an email", "Create a summary", "Generate a post"
+- Narrated descriptions of what to create: "I'm writing an email to my boss about how I can't make it in on Monday because of X" — this describes the situation but contains NO actual email body, greeting, or prose meant to be sent
+- Scenario summaries: "I need to tell my boss I can't come in because of a doctor's appointment and Michael will cover my shift" — describes what to say, but IS NOT the message itself
+
+PROFESSIONAL mode — the text IS actual content (even rough or incomplete):
+- Has an actual salutation or greeting: "Hi [name]", "Dear Team", "Hey"
+- Contains real prose that forms the message body — sentences written as if already addressing the recipient
+- Example: "Hi Boss, just wanted to let you know I won't make it in Monday — emergency doctor's appt with my daughter. Mike's covering my shift."
+
+Decisive tests — apply in order:
+1. Does the text open with a greeting/salutation? → professional
+2. Does it contain actual prose written in the voice of the message (addressed to the recipient)? → professional
+3. Is it a narration/description of a scenario without actual message content? → prompt
+4. Is it an imperative command? → prompt
 
 STEP 2 — POLISH
 Rewrite the text following the rules for the detected mode. Preserve the user's voice and intent throughout — polish is invisible.
 
-If mode is "prompt": Precision is the goal, not elegance. Make the intent unmistakable. Add implied context the AI would need. Define constraints (tone, format, length, audience) where genuinely missing. Strip filler. CRITICAL: Do NOT execute the prompt — output only an improved version of the instruction itself. Do NOT add placeholders like [name] or [date] that weren't in the original. Do NOT expand into numbered requirement lists. Only fix grammar, tighten wording, and improve structure. Keep it concise. ${GOOD_PROMPT_PRINCIPLES}
+If mode is "prompt": Precision is the goal, not elegance. Structure the output using XML-style tags — use only the tags that meaningfully apply:
+<Context>Background situation or information the AI needs</Context>
+<Request>The specific task or action requested from the AI</Request>
+<Explanation>Key constraints, requirements, tone, format, or audience details</Explanation>
+<Outcome>Expected format and quality of the AI's output</Outcome>
+Always include at least <Context> and <Request>. Omit tags whose content would be empty or redundant. Do NOT execute the prompt — output only an improved version of the instruction. Do NOT add placeholders like [name] or [date] that weren't in the original. ${GOOD_PROMPT_PRINCIPLES}
 
 If mode is "professional": Effectiveness with voice preserved. Keep it sounding like the person — not a corporate template. Calibrate tone to the relationship and audience. One clear point or ask. No filler or padding. Never over-polish. The user should feel like a better version of themselves wrote it. ${GOOD_WRITING_PRINCIPLES}
 
@@ -48,7 +78,7 @@ For "prompt" mode only, also grade: Prompt Specificity (would an AI model know e
 Each dimension gets one of exactly three tiers: "Excellent", "Good", or "Needs Work".
 Overall tier = the most common tier among dimensions; if tied, use the lower tier.
 
-Write 2–4 feedback bullets that are direct, specific, and actionable. Each bullet is a single plain sentence. No markdown symbols. Alternate between what is strong and what could improve. Reference specific aspects of the text, not generic advice.
+Write 2–3 improvement suggestions — specific, actionable things that would make the output better. Each is a single plain sentence, no markdown symbols. Focus only on what could be improved, not what is already good. If all dimensions are "Excellent" or there is nothing meaningful to improve, return an empty feedback array. Reference specific aspects of the text, not generic advice.
 
 OUTPUT FORMAT
 Return ONLY a valid JSON object with no markdown fences, no preamble, no trailing text.
@@ -102,12 +132,14 @@ function normalizeMode(v: unknown): PolishMode {
 }
 
 export async function rewrite(
-  text: string
+  text: string,
+  style?: string
 ): Promise<{ polishedText: string; detectedMode: PolishMode; grade: GradeResult }> {
+  const styleModifier = (style && STYLE_INSTRUCTIONS[style]) ?? "";
   const message = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 6000,
-    system: REWRITE_SYSTEM,
+    system: REWRITE_SYSTEM + styleModifier,
     messages: [{ role: "user", content: text }],
   });
 
@@ -289,7 +321,7 @@ export async function improveWithContext(
 
   const improveInstructions = processedAnswers.length > 0
     ? mode === "prompt"
-      ? ` The user answered clarifying questions with CONCRETE DETAILS (names, dates, preferences, etc.). Weave these specific details directly into the prompt so it becomes more precise and ready-to-use. Replace any remaining placeholders with the actual details provided. Keep the prompt concise. Your output must be a single improved PROMPT (the instruction text). Do NOT output the result of running the prompt (e.g. do not output an email, essay, or other generated content).`
+      ? ` The user answered clarifying questions with CONCRETE DETAILS (names, dates, preferences, etc.). Weave these specific details directly into the prompt so it becomes more precise and ready-to-use. Structure the output using XML-style tags (<Context>, <Request>, <Explanation>, <Outcome>) — use only the tags that meaningfully apply, always include at least <Context> and <Request>. Do NOT output the result of running the prompt (e.g. do not output an email, essay, or other generated content).`
       : ` Integrate the clarifying answers CONCISELY into the text. Do not expand beyond what the answers say; remove any redundancy. Keep the output as short as possible while still incorporating the new information. Preserve the user's authentic voice throughout. Your output must be a single improved piece of writing.`
     : "";
 
@@ -298,7 +330,7 @@ export async function improveWithContext(
 After improving, grade YOUR IMPROVED VERSION on these dimensions: ${gradeDimensions}.
 Each dimension gets one of: "Excellent", "Good", or "Needs Work".
 Overall tier = the most common tier; if tied, use the lower tier.
-Write 2–4 feedback bullets — direct, specific, actionable, plain sentences (no markdown symbols).
+Write 2–3 improvement suggestions — specific, actionable plain sentences (no markdown symbols). Focus only on what could be improved. If all dimensions are "Excellent", return an empty feedback array.
 
 Return ONLY a valid JSON object with no markdown fences, no preamble, no trailing text:
 {"improvedText":"your improved text here","grade":{"overall":"Good","dimensions":{"Dim1":"Excellent","Dim2":"Good"},"feedback":["sentence one","sentence two"]}}`;

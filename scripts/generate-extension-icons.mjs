@@ -15,6 +15,8 @@ const root = join(__dirname, "..");
 const pngPath = join(root, "public", "Logo (1).png");
 const svgPath = join(root, "public", "Logo (1).svg");
 const outDir = join(root, "extension", "public", "icon");
+const faviconPublic = join(root, "public", "favicon.png");
+const faviconApp = join(root, "src", "app", "icon.png");
 const sizes = [16, 32, 48, 128];
 
 mkdirSync(outDir, { recursive: true });
@@ -29,6 +31,10 @@ async function run() {
       await pipeline.png().toFile(outPath);
       console.log(`Wrote ${outPath}`);
     }
+    const favicon32 = await input.clone().resize(32, 32).png().toBuffer();
+    writeFileSync(faviconPublic, favicon32);
+    writeFileSync(faviconApp, favicon32);
+    console.log(`Wrote ${faviconPublic} and ${faviconApp} (website favicon from Logo (1).png)`);
     console.log("Done. Extension icons updated from Logo (1).png.");
   } else {
     const svg = readFileSync(svgPath, "utf8");
@@ -45,6 +51,11 @@ async function run() {
       writeFileSync(outPath, buf);
       console.log(`Wrote ${outPath}`);
     }
+    const resvg32 = new Resvg(svg, { fitTo: { mode: "width", value: 32 } });
+    const favicon32 = resvg32.render().asPng();
+    writeFileSync(faviconPublic, favicon32);
+    writeFileSync(faviconApp, favicon32);
+    console.log(`Wrote ${faviconPublic} and ${faviconApp} (website favicon from Logo (1).svg)`);
     console.log("Done. Extension icons updated from Logo (1).svg.");
   }
 }

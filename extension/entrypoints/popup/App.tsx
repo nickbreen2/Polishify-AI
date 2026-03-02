@@ -3,6 +3,7 @@ import { ClarifyModal } from "@/components/ClarifyModal";
 import { GradeCard } from "@/components/GradeCard";
 import type {
   PolishMode,
+  OutputStyle,
   PolishResponse,
   PolishError,
   ClarifyResponse,
@@ -12,6 +13,71 @@ import type {
   ClarifyingQuestion,
   GradeResult,
 } from "@/lib/types";
+
+const OUTPUT_STYLES: OutputStyle[] = ["Detailed", "Concise", "Structured", "Creative"];
+
+function StyleDropdown({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: OutputStyle;
+  onChange: (v: OutputStyle) => void;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 py-1.5 pl-3 pr-2.5 rounded-md border border-gray-200 text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {value}
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 10 10"
+          fill="none"
+          className={`text-gray-400 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+        >
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 bg-white rounded-lg border border-gray-200 shadow-lg z-50 overflow-hidden min-w-[110px]">
+          {OUTPUT_STYLES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => { onChange(s); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors ${
+                s === value
+                  ? "bg-[#f0f3ff] text-[#456BFF]"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Client-side heuristic: single-word input with very few vowels is likely gibberish. */
 function looksLikeGibberish(text: string): boolean {
@@ -34,6 +100,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [style, setStyle] = useState<OutputStyle>("Detailed");
 
   // Auto-detected mode and grade from polish response
   const [detectedMode, setDetectedMode] = useState<PolishMode | null>(null);
@@ -74,6 +141,7 @@ export default function App() {
       const response = (await browser.runtime.sendMessage({
         type: "POLISH_REQUEST",
         text,
+        style,
       })) as PolishResponse | PolishError;
 
       if (response.type === "POLISH_ERROR") {
@@ -262,15 +330,15 @@ export default function App() {
   return (
     <div className="w-[380px] min-h-[420px] max-h-[600px] flex flex-col">
       {/* Header - always visible */}
-      <div className="flex items-center gap-2 p-4 pb-4 shrink-0 border-b border-[#f2f2f2]">
+      <div className="flex items-center justify-between p-4 pb-4 shrink-0 border-b border-[#f2f2f2]">
         <img
-          src={browser.runtime.getURL("/logo.png")}
-          alt="Polishify AI"
-          width={20}
-          height={20}
-          className="w-5 h-5 shrink-0"
+          src={browser.runtime.getURL("/full-logo.svg")}
+          alt="Polishify"
+          className="h-7 w-auto shrink-0"
         />
-        <h1 className="text-lg font-semibold text-gray-900">Polishify AI</h1>
+        <span className="rounded-full bg-[#F0F1F5] px-2.5 py-0.5 text-xs font-medium text-zinc-500">
+          Free
+        </span>
       </div>
 
       {showQuestionsPage ? (
@@ -297,9 +365,12 @@ export default function App() {
                   Paste your text or prompt in the text box below for a more polished version
                 </p>
 
-                <label className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3 block">
-                  Paste here
-                </label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                    Paste here
+                  </label>
+                  <StyleDropdown value={style} onChange={setStyle} disabled={loading} />
+                </div>
                 <textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -333,27 +404,30 @@ export default function App() {
                   <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
                     {improveUsed ? "Improved version" : "Polished version"}
                   </label>
-                  <button
-                    type="button"
-                    onClick={handleCopy}
-                    disabled={loading}
-                    className={`shrink-0 py-1.5 px-2.5 rounded-md border text-xs font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 ${
-                      copied
-                        ? "bg-green-600 border-green-600 text-white"
-                        : "border-gray-200 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    {!copied && (
-                      <img
-                        src={browser.runtime.getURL("/copy.svg")}
-                        alt=""
-                        width={14}
-                        height={14}
-                        className="w-3.5 h-3.5 shrink-0"
-                      />
-                    )}
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleCopy}
+                      disabled={loading}
+                      className={`shrink-0 py-1.5 px-2.5 rounded-md border text-xs font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 ${
+                        copied
+                          ? "bg-green-600 border-green-600 text-white"
+                          : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {!copied && (
+                        <img
+                          src={browser.runtime.getURL("/copy.svg")}
+                          alt=""
+                          width={14}
+                          height={14}
+                          className="w-3.5 h-3.5 shrink-0"
+                        />
+                      )}
+                      {copied ? "Copied!" : "Copy"}
+                    </button>
+                    <StyleDropdown value={style} onChange={setStyle} disabled={loading} />
+                  </div>
                 </div>
                 {loading || clarifyStep === "improving" ? (
                   <div className="min-h-[80px] flex items-center justify-center gap-2 text-[#607AFF] text-sm mb-4 rounded-lg border border-gray-200 bg-gray-50">
@@ -370,8 +444,8 @@ export default function App() {
                   />
                 )}
 
-                {grade && detectedMode && (
-                  <GradeCard grade={grade} detectedMode={detectedMode} />
+                {grade && (
+                  <GradeCard grade={grade} />
                 )}
               </div>
             )}
