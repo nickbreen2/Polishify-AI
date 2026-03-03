@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rewrite } from "@/lib/anthropic";
 import { rateLimit } from "@/lib/rate-limit";
+import { auth } from "@/auth";
+import { sql, ensureUsersTable } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  const userEmail = session?.user?.email;
+
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: "You must be signed in to use Polishify." },
+      { status: 401 }
+    );
+  }
+
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     "unknown";
@@ -44,8 +56,36 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  await ensureUsersTable();
+
+  const [user] =
+    await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "User account not found." },
+      { status: 404 }
+    );
+  }
+
+  if (user.api_used_this_period >= user.api_quota_monthly) {
+    return NextResponse.json(
+      {
+        error:
+          "You have reached your monthly API limit. Upgrade your plan or wait until your quota resets.",
+      },
+      { status: 402 }
+    );
+  }
+
   try {
     const result = await rewrite(text, style);
+
+    await sql`
+      UPDATE users
+      SET api_used_this_period = api_used_this_period + 1
+      WHERE id = ${user.id}
+    `;
 
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },
