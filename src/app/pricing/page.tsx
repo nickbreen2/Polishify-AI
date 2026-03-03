@@ -1,6 +1,28 @@
+"use client";
+
 import { Navbar } from "@/components/Navbar";
 
-const EXTENSION_URL = "#"; // TODO: replace with Chrome Web Store URL when published
+async function startCheckout(plan: "pro" | "team") {
+  try {
+    const res = await fetch("/api/billing/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan }),
+    });
+
+    if (!res.ok) {
+      console.error("Failed to start checkout", await res.text());
+      return;
+    }
+
+    const data = (await res.json()) as { url?: string };
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch (error) {
+    console.error("Unexpected error starting checkout", error);
+  }
+}
 
 function CheckIcon({ brand }: { brand?: boolean }) {
   return (
@@ -63,14 +85,18 @@ export default function PricingPage() {
             </div>
             <p className="mt-2 text-sm text-zinc-500">For power users who write a lot.</p>
             <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
-              {["Unlimited polishes", "General writing", "Prompt engineering", "Chrome extension", "Priority AI processing"].map((f) => (
+              {["1,000 API calls / month", "General writing", "Prompt engineering", "Chrome extension", "Priority AI processing"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon brand />{f}</li>
               ))}
             </ul>
             <div className="mt-auto pt-8">
-              <a href={EXTENSION_URL} className="block w-full rounded-xl bg-gradient-to-b from-[#456BFF] to-[#2548D2] py-2.5 text-center text-sm font-semibold text-white transition hover:opacity-95">
+              <button
+                type="button"
+                onClick={() => startCheckout("pro")}
+                className="block w-full rounded-xl bg-gradient-to-b from-[#456BFF] to-[#2548D2] py-2.5 text-center text-sm font-semibold text-white transition hover:opacity-95"
+              >
                 Upgrade to Pro
-              </a>
+              </button>
             </div>
           </div>
 
@@ -83,14 +109,18 @@ export default function PricingPage() {
             </div>
             <p className="mt-2 text-sm text-zinc-500">For teams that communicate together.</p>
             <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
-              {["Everything in Pro", "Up to 10 seats", "Shared usage dashboard", "Team billing", "Priority support"].map((f) => (
+              {["10,000 API calls / month", "Everything in Pro", "Up to 10 seats", "Shared usage dashboard", "Team billing", "Priority support"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon />{f}</li>
               ))}
             </ul>
             <div className="mt-auto pt-8">
-              <a href={EXTENSION_URL} className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+              <button
+                type="button"
+                onClick={() => startCheckout("team")}
+                className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
                 Upgrade to Team
-              </a>
+              </button>
             </div>
           </div>
 

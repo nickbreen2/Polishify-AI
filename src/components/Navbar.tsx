@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 import { useAuthModal } from "./AuthModalContext";
 import { SettingsModal } from "./SettingsModal";
 
-const EXTENSION_URL = "#"; // TODO: replace with Chrome Web Store URL
-
 const TABS = [
   { label: "Polish", href: "/#polish" },
   { label: "Pricing", href: "/pricing" },
@@ -82,7 +80,7 @@ export function Navbar() {
             <div ref={settingsRef} className="relative">
               <button
                 onClick={() => setShowSettings((v) => !v)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E8E9EF] text-sm font-semibold text-zinc-800 transition hover:bg-[#d8d9e0]"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#456BFF] to-[#2548D2] text-sm font-semibold text-white transition hover:opacity-95"
               >
                 {initial}
               </button>
@@ -128,25 +126,22 @@ export function Navbar() {
               )}
             </div>
           ) : (
-            <button
-              onClick={open}
-              className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900"
-            >
-              Sign in
-            </button>
+            <>
+              <button
+                onClick={() => open("signin")}
+                className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900"
+              >
+                Sign in
+              </button>
+              <div className="h-4 w-px bg-zinc-200" />
+              <button
+                onClick={() => open("signup")}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
+              >
+                Sign up
+              </button>
+            </>
           )}
-
-          <div className="h-4 w-px bg-zinc-200" />
-
-          <a
-            href={EXTENSION_URL}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Get Extension
-          </a>
         </div>
 
         {/* Hamburger — mobile only */}
@@ -203,23 +198,21 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => { open(); setMobileMenuOpen(false); }}
-                className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-600 transition hover:bg-zinc-100"
-              >
-                Sign in
-              </button>
+              <>
+                <button
+                  onClick={() => { open("signin"); setMobileMenuOpen(false); }}
+                  className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-600 transition hover:bg-zinc-100"
+                >
+                  Sign in
+                </button>
+                <button
+                  onClick={() => { open("signup"); setMobileMenuOpen(false); }}
+                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+                >
+                  Sign up
+                </button>
+              </>
             )}
-            <a
-              href={EXTENSION_URL}
-              onClick={() => setMobileMenuOpen(false)}
-              className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Get Extension
-            </a>
           </div>
         </div>
       )}
