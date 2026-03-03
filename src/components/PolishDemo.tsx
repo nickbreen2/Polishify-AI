@@ -124,7 +124,7 @@ export function PolishDemo() {
     if (!text || loading) return;
 
     if (!session && freeUsed) {
-      openAuthModal();
+      openAuthModal("signup");
       return;
     }
 
@@ -564,7 +564,7 @@ export function PolishDemo() {
             That was your <span className="font-semibold">free polish</span>. Sign up to keep going.
           </p>
           <button
-            onClick={openAuthModal}
+            onClick={() => openAuthModal("signup")}
             className="shrink-0 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-95"
           >
             Sign up free →

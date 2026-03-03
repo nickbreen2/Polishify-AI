@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sql } from "@/lib/db";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
   const sig = req.headers.get("stripe-signature");
@@ -33,8 +31,12 @@ export async function POST(req: NextRequest) {
     ) {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
-      const priceId = subscription.items.data[0]?.price?.id;
-      const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
+      const firstItem = subscription.items.data[0];
+      const priceId = firstItem?.price?.id;
+      const currentPeriodEnd =
+        firstItem?.current_period_end != null
+          ? new Date(firstItem.current_period_end * 1000)
+          : null;
 
       let plan: "free" | "pro" | "team" = "free";
       let quota = 20;
