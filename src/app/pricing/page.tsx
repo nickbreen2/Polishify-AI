@@ -50,20 +50,20 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
+    <div className="min-h-screen bg-zinc-50 font-sans">
       <Navbar />
 
       {/* Spacer for fixed nav */}
       <div className="h-[57px]" />
 
       <main className="flex flex-col items-center px-8 py-20">
-        <h1 className="mb-2 text-center text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
+        <h1 className="mb-2 text-center text-4xl font-bold tracking-tight text-zinc-900">
           Pricing
         </h1>
         <p className="mb-12 text-center text-sm text-zinc-500">Simple, transparent pricing. No surprises.</p>
 
         {checkoutError && (
-          <div className="mb-6 w-full max-w-4xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+          <div className="mb-6 w-full max-w-4xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {checkoutError}
           </div>
         )}
@@ -71,37 +71,37 @@ export default function PricingPage() {
         <div className="grid w-full max-w-4xl gap-4 sm:grid-cols-3">
 
           {/* Free */}
-          <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Free</p>
             <div className="mt-3 flex items-end gap-1">
-              <span className="text-4xl font-bold text-zinc-900 dark:text-white">$0</span>
+              <span className="text-4xl font-bold text-zinc-900">$0</span>
               <span className="mb-1 text-sm text-zinc-400">/mo</span>
             </div>
             <p className="mt-2 text-sm text-zinc-500">Get started at no cost.</p>
-            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600">
               {["20 polishes / month", "General writing", "Prompt engineering", "Chrome extension"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon />{f}</li>
               ))}
             </ul>
             <div className="mt-auto pt-8">
-              <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-sm font-semibold text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
+              <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-sm font-semibold text-zinc-400">
                 Current plan
               </div>
             </div>
           </div>
 
           {/* Pro */}
-          <div className="relative flex flex-col rounded-xl border-2 border-brand bg-white p-6 shadow-lg dark:bg-zinc-900">
+          <div className="relative flex flex-col rounded-xl border-2 border-brand bg-white p-6 shadow-lg">
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-xs font-semibold text-white">
               Most popular
             </span>
             <p className="text-xs font-semibold uppercase tracking-widest text-brand">Pro</p>
             <div className="mt-3 flex items-end gap-1">
-              <span className="text-4xl font-bold text-zinc-900 dark:text-white">$9</span>
+              <span className="text-4xl font-bold text-zinc-900">$9</span>
               <span className="mb-1 text-sm text-zinc-400">/mo</span>
             </div>
             <p className="mt-2 text-sm text-zinc-500">For power users who write a lot.</p>
-            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600">
               {["200 polishes / month", "General writing", "Prompt engineering", "Chrome extension", "Priority AI processing"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon brand />{f}</li>
               ))}
@@ -119,14 +119,14 @@ export default function PricingPage() {
           </div>
 
           {/* Team */}
-          <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Team</p>
             <div className="mt-3 flex items-end gap-1">
-              <span className="text-4xl font-bold text-zinc-900 dark:text-white">$29</span>
+              <span className="text-4xl font-bold text-zinc-900">$29</span>
               <span className="mb-1 text-sm text-zinc-400">/mo</span>
             </div>
             <p className="mt-2 text-sm text-zinc-500">For teams that communicate together.</p>
-            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600">
               {["800 polishes / month", "Everything in Pro", "Up to 10 seats", "Shared usage dashboard", "Team billing", "Priority support"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon />{f}</li>
               ))}
@@ -136,7 +136,7 @@ export default function PricingPage() {
                 type="button"
                 onClick={() => startCheckout("team")}
                 disabled={loadingPlan !== null}
-                className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 disabled:opacity-60"
+                className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-60"
               >
                 {loadingPlan === "team" ? "Redirecting…" : "Upgrade to Team"}
               </button>
@@ -146,7 +146,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <footer className="border-t border-zinc-200 py-8 text-center text-sm text-zinc-400 dark:border-zinc-800">
+      <footer className="border-t border-zinc-200 py-8 text-center text-sm text-zinc-400">
         Chrome extension — free &amp; open source
       </footer>
     </div>

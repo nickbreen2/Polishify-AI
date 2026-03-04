@@ -30,7 +30,7 @@ export function FloatingIcons() {
       {ICONS.map((icon) => (
         <div
           key={icon.name}
-          className="absolute flex h-14 w-14 items-center justify-center rounded-2xl border border-white/50 bg-white/25 p-3 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-white/5"
+          className="absolute flex h-14 w-14 items-center justify-center rounded-2xl border border-white/50 bg-white/25 p-3 shadow-lg backdrop-blur-md"
           style={{
             ...icon.style,
             animation: `${icon.animation} ${icon.duration} ease-in-out ${icon.delay} infinite`,
@@ -40,7 +40,7 @@ export function FloatingIcons() {
             <img
               src={icon.cdnSlug ? `https://cdn.simpleicons.org/${icon.cdnSlug}` : `/icons/${icon.file}`}
               alt={icon.name}
-              className="h-full w-full object-contain dark:invert"
+              className="h-full w-full object-contain"
             />
           )}
         </div>
