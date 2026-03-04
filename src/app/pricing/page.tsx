@@ -1,28 +1,7 @@
 "use client";
 
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
-
-async function startCheckout(plan: "pro" | "team") {
-  try {
-    const res = await fetch("/api/billing/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan }),
-    });
-
-    if (!res.ok) {
-      console.error("Failed to start checkout", await res.text());
-      return;
-    }
-
-    const data = (await res.json()) as { url?: string };
-    if (data.url) {
-      window.location.href = data.url;
-    }
-  } catch (error) {
-    console.error("Unexpected error starting checkout", error);
-  }
-}
 
 function CheckIcon({ brand }: { brand?: boolean }) {
   return (
@@ -38,6 +17,38 @@ function CheckIcon({ brand }: { brand?: boolean }) {
 }
 
 export default function PricingPage() {
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<"pro" | "team" | null>(null);
+
+  async function startCheckout(plan: "pro" | "team") {
+    setCheckoutError(null);
+    setLoadingPlan(plan);
+    try {
+      const res = await fetch("/api/billing/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+
+      if (!res.ok) {
+        console.error("Failed to start checkout", data.error);
+        setCheckoutError(data.error ?? "Failed to start checkout. Please try again.");
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error("Unexpected error starting checkout", error);
+      setCheckoutError("Unexpected error. Please try again.");
+    } finally {
+      setLoadingPlan(null);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
       <Navbar />
@@ -50,6 +61,12 @@ export default function PricingPage() {
           Pricing
         </h1>
         <p className="mb-12 text-center text-sm text-zinc-500">Simple, transparent pricing. No surprises.</p>
+
+        {checkoutError && (
+          <div className="mb-6 w-full max-w-4xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+            {checkoutError}
+          </div>
+        )}
 
         <div className="grid w-full max-w-4xl gap-4 sm:grid-cols-3">
 
@@ -85,7 +102,7 @@ export default function PricingPage() {
             </div>
             <p className="mt-2 text-sm text-zinc-500">For power users who write a lot.</p>
             <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
-              {["1,000 API calls / month", "General writing", "Prompt engineering", "Chrome extension", "Priority AI processing"].map((f) => (
+              {["200 polishes / month", "General writing", "Prompt engineering", "Chrome extension", "Priority AI processing"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon brand />{f}</li>
               ))}
             </ul>
@@ -93,9 +110,10 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={() => startCheckout("pro")}
-                className="block w-full rounded-xl bg-gradient-to-b from-[#456BFF] to-[#2548D2] py-2.5 text-center text-sm font-semibold text-white transition hover:opacity-95"
+                disabled={loadingPlan !== null}
+                className="block w-full rounded-xl bg-gradient-to-b from-[#456BFF] to-[#2548D2] py-2.5 text-center text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-60"
               >
-                Upgrade to Pro
+                {loadingPlan === "pro" ? "Redirecting…" : "Upgrade to Pro"}
               </button>
             </div>
           </div>
@@ -109,7 +127,7 @@ export default function PricingPage() {
             </div>
             <p className="mt-2 text-sm text-zinc-500">For teams that communicate together.</p>
             <ul className="mt-6 flex flex-col gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
-              {["10,000 API calls / month", "Everything in Pro", "Up to 10 seats", "Shared usage dashboard", "Team billing", "Priority support"].map((f) => (
+              {["800 polishes / month", "Everything in Pro", "Up to 10 seats", "Shared usage dashboard", "Team billing", "Priority support"].map((f) => (
                 <li key={f} className="flex items-center gap-2"><CheckIcon />{f}</li>
               ))}
             </ul>
@@ -117,9 +135,10 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={() => startCheckout("team")}
-                className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                disabled={loadingPlan !== null}
+                className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 disabled:opacity-60"
               >
-                Upgrade to Team
+                {loadingPlan === "team" ? "Redirecting…" : "Upgrade to Team"}
               </button>
             </div>
           </div>

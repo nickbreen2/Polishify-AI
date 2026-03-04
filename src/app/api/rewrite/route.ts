@@ -58,14 +58,18 @@ export async function POST(request: NextRequest) {
 
   await ensureUsersTable();
 
-  const [user] =
+  // Ensure there's a users row for this authenticated email (works for OAuth and credentials users).
+  let [user] =
     await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
 
   if (!user) {
-    return NextResponse.json(
-      { error: "User account not found." },
-      { status: 404 }
-    );
+    const inserted =
+      await sql`
+        INSERT INTO users (email, password)
+        VALUES (${userEmail}, '')
+        RETURNING id, plan, api_quota_monthly, api_used_this_period
+      `;
+    user = inserted[0];
   }
 
   if (user.api_used_this_period >= user.api_quota_monthly) {
