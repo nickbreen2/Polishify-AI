@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
+
+type UserProfile = {
+  plan: string;
+  api_used_this_period: number;
+  api_quota_monthly: number;
+  billing_period_ends_at: string | null;
+};
 
 function EyeIcon({ open }: { open: boolean }) {
   if (open) {
@@ -64,6 +71,17 @@ export function SettingsModal({ onClose, email }: { onClose: () => void; email: 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => setProfile(data))
+      .catch(() => null)
+      .finally(() => setProfileLoading(false));
+  }, []);
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -147,6 +165,53 @@ export function SettingsModal({ onClose, email }: { onClose: () => void; email: 
           <div className="flex flex-col gap-1">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Account</p>
             <p className="text-sm text-gray-700">{email}</p>
+          </div>
+
+          <div className="border-t border-gray-100" />
+
+          {/* Credits */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Credits</p>
+              {profileLoading ? (
+                <span className="h-4 w-12 animate-pulse rounded bg-gray-100" />
+              ) : profile ? (
+                <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 capitalize">
+                  {profile.plan}
+                </span>
+              ) : null}
+            </div>
+
+            {profileLoading ? (
+              <div className="flex flex-col gap-2">
+                <div className="h-2 w-full animate-pulse rounded-full bg-gray-100" />
+                <div className="h-3 w-32 animate-pulse rounded bg-gray-100" />
+              </div>
+            ) : profile ? (
+              <div className="flex flex-col gap-2">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#456BFF] to-[#2548D2] transition-all"
+                    style={{ width: `${Math.min(100, (profile.api_used_this_period / profile.api_quota_monthly) * 100)}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500">
+                    {profile.api_used_this_period} / {profile.api_quota_monthly} credits used this month
+                  </p>
+                  {profile.plan === "free" && (
+                    <a href="/pricing" onClick={onClose} className="text-xs font-medium text-[#456BFF] hover:underline">
+                      Upgrade
+                    </a>
+                  )}
+                </div>
+                {profile.billing_period_ends_at && (
+                  <p className="text-xs text-gray-400">
+                    Resets {new Date(profile.billing_period_ends_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
 
           <div className="border-t border-gray-100" />

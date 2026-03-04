@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
 
       if (priceId === process.env.STRIPE_PRICE_PRO_MONTHLY) {
         plan = "pro";
-        quota = 1000;
+        quota = 200;
       } else if (priceId === process.env.STRIPE_PRICE_TEAM_MONTHLY) {
         plan = "team";
-        quota = 10000;
+        quota = 800;
       }
 
       await sql`

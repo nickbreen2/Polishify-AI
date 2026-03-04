@@ -25,6 +25,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const user = rows[0];
         if (!user) return null;
 
+        // Only attempt password comparison for users with a real bcrypt hash.
+        if (
+          !user.password ||
+          typeof user.password !== "string" ||
+          !user.password.startsWith("$2")
+        ) {
+          return null;
+        }
+
         const valid = await bcrypt.compare(
           credentials.password as string,
           user.password as string
