@@ -5,7 +5,7 @@ import { FloatingIcons } from "@/components/FloatingIcons";
 
 export default function Home() {
   return (
-    <div className="relative bg-zinc-50 font-sans dark:bg-black">
+    <div className="relative bg-zinc-50 font-sans">
       {/* Grid background */}
       <div className="bg-grid pointer-events-none absolute inset-0" />
 
@@ -26,7 +26,7 @@ export default function Home() {
             <div className="relative z-10 flex w-full max-w-2xl flex-col items-center gap-8">
               <div className="flex flex-col items-center gap-4 text-center">
                 {/* Badge */}
-                <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-600 shadow-[0_2px_16px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-zinc-300 dark:shadow-[0_2px_16px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-600 shadow-[0_2px_16px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6)] backdrop-blur-xl">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-heartbeat absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
@@ -34,21 +34,21 @@ export default function Home() {
                   AI-Powered Refinement
                 </div>
 
-                <h1 className="text-3xl font-bold leading-tight tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
+                <h1 className="text-3xl font-bold leading-tight tracking-tight text-zinc-900 sm:text-5xl">
                   Polish it<br />Before you send it.
                 </h1>
-                <p className="max-w-md text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
+                <p className="max-w-md text-base leading-relaxed text-zinc-500 sm:text-lg">
                   Select any text on the web, polish it with AI, and replace it in-place.
                 </p>
               </div>
               <PolishDemo />
 
               {/* Chrome Extension Coming Soon */}
-              <div className="flex items-center gap-2.5 rounded-full border border-zinc-200/80 bg-white/60 px-5 py-2.5 text-sm text-zinc-500 shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-sm dark:border-zinc-700/60 dark:bg-zinc-800/50 dark:text-zinc-400">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500" fill="currentColor" aria-hidden="true">
+              <div className="flex items-center gap-2.5 rounded-full border border-zinc-200/80 bg-white/60 px-5 py-2.5 text-sm text-zinc-500 shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-zinc-400" fill="currentColor" aria-hidden="true">
                   <path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-5.344 9.257c.206.01.413.016.621.016 6.627 0 12-5.373 12-12 0-1.54-.29-3.011-.818-4.364zM12 10.545A1.455 1.455 0 1 0 12 13.456a1.455 1.455 0 0 0 0-2.91z" />
                 </svg>
-                <span>Chrome Extension — <span className="font-medium text-zinc-600 dark:text-zinc-300">Coming Soon</span></span>
+                <span>Chrome Extension — <span className="font-medium text-zinc-600">Coming Soon</span></span>
               </div>
             </div>
           </section>
@@ -56,14 +56,14 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="w-full border-t border-zinc-200 dark:border-zinc-800">
+        <footer className="w-full border-t border-zinc-200">
           <div className="flex w-full flex-col items-center gap-4 px-4 py-4 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <span className="text-center sm:text-left">Built by the Polishify team — free &amp; open source</span>
             <a
               href="https://github.com/nickbreen2/Polishify-AI"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-shadow hover:shadow-[0_1px_4px_rgba(0,0,0,0.08)] sm:w-auto dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_1px_4px_rgba(0,0,0,0.25)]"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-shadow hover:shadow-[0_1px_4px_rgba(0,0,0,0.08)] sm:w-auto"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
