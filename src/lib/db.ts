@@ -9,7 +9,7 @@ export async function ensureUsersTable() {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
+      password TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;

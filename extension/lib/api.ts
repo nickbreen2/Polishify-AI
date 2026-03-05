@@ -1,7 +1,6 @@
 import type { PolishMode, ClarifyingQuestion, GradeResult, OutputStyle } from "./types";
 
-// TODO: change to production URL before shipping to Chrome Web Store
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "https://polishify.app/api";
 
 export async function polishText(
   text: string,
