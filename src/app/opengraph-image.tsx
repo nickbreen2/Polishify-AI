@@ -22,18 +22,6 @@ export default function Image() {
       >
         <div
           style={{
-            background: "rgba(255,255,255,0.12)",
-            borderRadius: 24,
-            padding: "16px 28px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span style={{ fontSize: 72, lineHeight: 1 }}>✦</span>
-        </div>
-        <div
-          style={{
             color: "white",
             fontSize: 72,
             fontWeight: 700,
