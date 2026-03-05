@@ -36,12 +36,10 @@ async function main() {
   try {
     await sql`
       CREATE TABLE IF NOT EXISTS users (
-        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        id         SERIAL PRIMARY KEY,
         email      TEXT NOT NULL UNIQUE,
-        password   TEXT NOT NULL,
-        name       TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        password   TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS users_email_idx ON users (email)`;

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const inserted =
       await sql`
         INSERT INTO users (email, password)
-        VALUES (${userEmail}, '')
+        VALUES (${userEmail}, NULL)
         RETURNING id, plan, api_quota_monthly, api_used_this_period
       `;
     user = inserted[0];

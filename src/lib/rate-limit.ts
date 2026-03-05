@@ -1,3 +1,7 @@
+// WARNING: This in-memory store is NOT durable. It resets on every serverless
+// cold start, so the rate limit can be bypassed simply by triggering a new
+// function instance. For production-grade rate limiting, replace this with a
+// persistent store such as @upstash/ratelimit + @upstash/redis or Vercel KV.
 const store = new Map<string, { count: number; resetAt: number }>();
 
 const MAX_REQUESTS = 10;

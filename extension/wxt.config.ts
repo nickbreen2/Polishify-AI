@@ -12,7 +12,7 @@ export default defineConfig({
     description: "Select text, polish it with AI, replace it in-place.",
     version: "0.1.0",
     permissions: ["activeTab", "contextMenus", "storage"],
-    host_permissions: ["http://localhost:3000/*"],
+    host_permissions: ["https://polishify.app/*"],
     commands: {
       "polish-selection": {
         suggested_key: {
