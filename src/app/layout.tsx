@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Polishify — Polish your writing with AI",
     description:
       "A Chrome extension that lets you select text on any website, improve it with AI, and replace it in-place.",
