@@ -23,6 +23,20 @@ export const metadata: Metadata = {
   title: "Polishify — Polish your writing with AI",
   description:
     "A Chrome extension that lets you select text on any website, improve it with AI, and replace it in-place.",
+  openGraph: {
+    title: "Polishify — Polish your writing with AI",
+    description:
+      "A Chrome extension that lets you select text on any website, improve it with AI, and replace it in-place.",
+    url: "https://polishify.app",
+    siteName: "Polishify",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Polishify — Polish your writing with AI",
+    description:
+      "A Chrome extension that lets you select text on any website, improve it with AI, and replace it in-place.",
+  },
 };
 
 export default function RootLayout({
