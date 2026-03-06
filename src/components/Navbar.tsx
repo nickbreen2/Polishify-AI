@@ -54,7 +54,13 @@ export function Navbar() {
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-zinc-200 bg-[#fafafa]">
       <div className="flex items-center justify-between px-6 py-3.5 md:px-8">
         {/* Logo */}
-        <a href="/"><img src="/full-logo.svg" alt="Polishify" className="h-7 w-auto" /></a>
+        <a href="/">
+          <img
+            src="/Polishify_Full_Logo.png"
+            alt="Polishify"
+            className="h-7 w-auto object-contain"
+          />
+        </a>
 
         {/* Center pill — desktop only */}
         <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 rounded-full border border-zinc-200 bg-zinc-100 p-1 md:flex">
