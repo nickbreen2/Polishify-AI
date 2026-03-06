@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    user = row;
+    user = row as { id: number; api_used_this_period: number; api_quota_monthly: number };
   }
 
   try {
