@@ -123,7 +123,7 @@ export function PolishDemo() {
     const text = input.trim();
     if (!text || loading) return;
 
-    if (!session) {
+    if (!session && freeUsed) {
       openAuthModal("signin");
       return;
     }
@@ -559,13 +559,13 @@ export function PolishDemo() {
 
       {/* Free trial nudge */}
       {result !== null && !session && (
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-[#456BFF]/20 bg-[#f0f3ff] px-4 py-3">
+        <div className="flex flex-col gap-3 rounded-xl border border-[#456BFF]/20 bg-[#f0f3ff] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm text-[#2548D2]">
             That was your <span className="font-semibold">free polish</span>. Sign up to keep going.
           </p>
           <button
             onClick={() => openAuthModal("signup")}
-            className="shrink-0 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-95"
+            className="self-start shrink-0 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-95 sm:self-auto"
           >
             Sign up free →
           </button>
