@@ -123,8 +123,8 @@ export function PolishDemo() {
     const text = input.trim();
     if (!text || loading) return;
 
-    if (!session && freeUsed) {
-      openAuthModal("signup");
+    if (!session) {
+      openAuthModal("signin");
       return;
     }
 
