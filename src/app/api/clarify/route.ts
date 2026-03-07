@@ -8,13 +8,6 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   const userEmail = session?.user?.email;
 
-  if (!userEmail) {
-    return NextResponse.json(
-      { error: "You must be signed in to use Polishify." },
-      { status: 401 }
-    );
-  }
-
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
@@ -66,29 +59,35 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await ensureUsersTable();
+  let user: { id: number; api_used_this_period: number; api_quota_monthly: number } | undefined;
 
-  let [user] =
-    await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
+  if (userEmail) {
+    await ensureUsersTable();
 
-  if (!user) {
-    const inserted =
-      await sql`
-        INSERT INTO users (email, password)
-        VALUES (${userEmail}, NULL)
-        RETURNING id, plan, api_quota_monthly, api_used_this_period
-      `;
-    user = inserted[0];
-  }
+    let [row] =
+      await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
 
-  if (user.api_used_this_period >= user.api_quota_monthly) {
-    return NextResponse.json(
-      {
-        error:
-          "You have reached your monthly API limit. Upgrade your plan or wait until your quota resets.",
-      },
-      { status: 402 }
-    );
+    if (!row) {
+      const inserted =
+        await sql`
+          INSERT INTO users (email, password)
+          VALUES (${userEmail}, NULL)
+          RETURNING id, plan, api_quota_monthly, api_used_this_period
+        `;
+      row = inserted[0];
+    }
+
+    if (row.api_used_this_period >= row.api_quota_monthly) {
+      return NextResponse.json(
+        {
+          error:
+            "You have reached your monthly API limit. Upgrade your plan or wait until your quota resets.",
+        },
+        { status: 402 }
+      );
+    }
+
+    user = row as { id: number; api_used_this_period: number; api_quota_monthly: number };
   }
 
   try {
@@ -99,11 +98,13 @@ export async function POST(request: NextRequest) {
       : "professional";
     const result = await getClarifyingQuestions(text, polished, normalizedMode, grade as import("@/lib/anthropic").GradeResult | undefined);
 
-    await sql`
-      UPDATE users
-      SET api_used_this_period = api_used_this_period + 1
-      WHERE id = ${user.id}
-    `;
+    if (user) {
+      await sql`
+        UPDATE users
+        SET api_used_this_period = api_used_this_period + 1
+        WHERE id = ${user.id}
+      `;
+    }
 
     return NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },

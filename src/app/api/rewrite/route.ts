@@ -8,11 +8,16 @@ export async function POST(request: NextRequest) {
   const session = await auth();
   const userEmail = session?.user?.email;
 
+  const anonUsed = request.cookies.get("polishly_anon_used")?.value === "1";
+
   if (!userEmail) {
-    return NextResponse.json(
-      { error: "You must be signed in to use Polishify." },
-      { status: 401 }
-    );
+    if (anonUsed) {
+      return NextResponse.json(
+        { error: "Sign in to continue polishing." },
+        { status: 401 }
+      );
+    }
+    // Anonymous first-time user — proceed without quota check
   }
 
   const ip =
@@ -56,44 +61,64 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await ensureUsersTable();
+  let user: { id: number; api_used_this_period: number; api_quota_monthly: number } | undefined;
 
-  // Ensure there's a users row for this authenticated email (works for OAuth and credentials users).
-  let [user] =
-    await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
+  if (userEmail) {
+    await ensureUsersTable();
 
-  if (!user) {
-    const inserted =
-      await sql`
-        INSERT INTO users (email, password)
-        VALUES (${userEmail}, NULL)
-        RETURNING id, plan, api_quota_monthly, api_used_this_period
-      `;
-    user = inserted[0];
-  }
+    // Ensure there's a users row for this authenticated email (works for OAuth and credentials users).
+    let [row] =
+      await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
 
-  if (user.api_used_this_period >= user.api_quota_monthly) {
-    return NextResponse.json(
-      {
-        error:
-          "You have reached your monthly API limit. Upgrade your plan or wait until your quota resets.",
-      },
-      { status: 402 }
-    );
+    if (!row) {
+      const inserted =
+        await sql`
+          INSERT INTO users (email, password)
+          VALUES (${userEmail}, NULL)
+          RETURNING id, plan, api_quota_monthly, api_used_this_period
+        `;
+      row = inserted[0];
+    }
+
+    if (row.api_used_this_period >= row.api_quota_monthly) {
+      return NextResponse.json(
+        {
+          error:
+            "You have reached your monthly API limit. Upgrade your plan or wait until your quota resets.",
+        },
+        { status: 402 }
+      );
+    }
+
+    user = row as { id: number; api_used_this_period: number; api_quota_monthly: number };
   }
 
   try {
     const result = await rewrite(text, style);
 
-    await sql`
-      UPDATE users
-      SET api_used_this_period = api_used_this_period + 1
-      WHERE id = ${user.id}
-    `;
+    if (user) {
+      await sql`
+        UPDATE users
+        SET api_used_this_period = api_used_this_period + 1
+        WHERE id = ${user.id}
+      `;
+    }
 
-    return NextResponse.json(result, {
+    const response = NextResponse.json(result, {
       headers: { "X-RateLimit-Remaining": String(remaining) },
     });
+
+    if (!userEmail) {
+      response.cookies.set("polishly_anon_used", "1", {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+        secure: process.env.NODE_ENV === "production",
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error("[rewrite] API error:", (error as Error).message);
     return NextResponse.json(
