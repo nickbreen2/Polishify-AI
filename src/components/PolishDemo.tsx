@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useAuthModal } from "./AuthModalContext";
+import { AnimatedPolishButton } from "./AnimatedPolishButton";
 
 type OutputStyle = "Detailed" | "Concise" | "Structured" | "Creative";
 const OUTPUT_STYLES: OutputStyle[] = ["Detailed", "Concise", "Structured", "Creative"];
@@ -341,23 +342,11 @@ export function PolishDemo() {
         {/* Toolbar inside the box */}
         <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
           <StyleDropdown value={style} onChange={setStyle} disabled={loading} />
-          <button
-            onClick={handlePolish}
+          <AnimatedPolishButton
+            loading={loading}
             disabled={!input.trim() || loading}
-            className="py-2 px-4 rounded-lg text-white font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2 bg-gradient-to-b from-[#456BFF] to-[#2548D2] hover:opacity-95"
-          >
-            {loading ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Polishifying…
-              </>
-            ) : (
-              <>
-                <img src="/sparks-solid.svg" alt="" width={18} height={18} className="w-[18px] h-[18px] shrink-0" />
-                Polishify
-              </>
-            )}
-          </button>
+            onClick={handlePolish}
+          />
         </div>
       </div>
 
