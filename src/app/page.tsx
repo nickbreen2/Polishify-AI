@@ -1,4 +1,3 @@
-import { Navbar } from "@/components/Navbar";
 import { PolishDemo } from "@/components/PolishDemo";
 import { FloatingIcons } from "@/components/FloatingIcons";
 
@@ -11,8 +10,6 @@ export default function Home() {
 
       {/* All content in a single z-[1] wrapper — guarantees it's above the grid */}
       <div className="relative z-[1] flex min-h-screen flex-col">
-        <Navbar />
-
         {/* Spacer for fixed nav */}
         <div className="h-[57px]" />
 

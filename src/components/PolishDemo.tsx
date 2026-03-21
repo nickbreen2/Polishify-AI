@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useAuthModal } from "./AuthModalContext";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { AnimatedPolishButton } from "./AnimatedPolishButton";
 
 type OutputStyle = "Detailed" | "Concise" | "Structured" | "Creative";
@@ -105,8 +104,8 @@ export function PolishDemo() {
   const [clarifySelectedOption, setClarifySelectedOption] = useState<string | null>(null);
   const [clarifyOtherText, setClarifyOtherText] = useState("");
 
-  const { data: session } = useSession();
-  const { open: openAuthModal } = useAuthModal();
+  const { isSignedIn } = useUser();
+  const { openSignIn, openSignUp } = useClerk();
   const resultRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -124,8 +123,8 @@ export function PolishDemo() {
     const text = input.trim();
     if (!text || loading) return;
 
-    if (!session && freeUsed) {
-      openAuthModal("signin");
+    if (!isSignedIn && freeUsed) {
+      openSignIn();
       return;
     }
 
@@ -150,7 +149,7 @@ export function PolishDemo() {
         setResult(data.polishedText ?? "");
         setDetectedMode(data.detectedMode ?? null);
         setGrade(data.grade ?? null);
-        if (!session) {
+        if (!isSignedIn) {
           localStorage.setItem(FREE_TRIAL_KEY, "1");
           setFreeUsed(true);
         }
@@ -547,13 +546,13 @@ export function PolishDemo() {
       )}
 
       {/* Free trial nudge */}
-      {result !== null && !session && (
+      {result !== null && !isSignedIn && (
         <div className="flex flex-col gap-3 rounded-xl border border-[#456BFF]/20 bg-[#f0f3ff] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm text-[#2548D2]">
             That was your <span className="font-semibold">free polish</span>. Sign up to keep going.
           </p>
           <button
-            onClick={() => openAuthModal("signup")}
+            onClick={() => openSignUp()}
             className="self-start shrink-0 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-95 sm:self-auto"
           >
             Sign up free →

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
-import { useAuthModal } from "./AuthModalContext";
 import { SettingsModal } from "./SettingsModal";
 
 const TABS = [
@@ -20,10 +19,10 @@ export function Navbar() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
-  const { data: session } = useSession();
-  const { open } = useAuthModal();
+  const { user, isSignedIn } = useUser();
+  const { openSignIn, openSignUp, signOut } = useClerk();
 
-  const email = session?.user?.email ?? "";
+  const email = user?.emailAddresses[0]?.emailAddress ?? "";
   const initial = email.charAt(0).toUpperCase();
 
   useEffect(() => {
@@ -82,7 +81,7 @@ export function Navbar() {
 
         {/* Right — desktop only */}
         <div className="hidden items-center gap-3 md:flex">
-          {session ? (
+          {isSignedIn ? (
             <div ref={settingsRef} className="relative">
               <button
                 onClick={() => setShowSettings((v) => !v)}
@@ -120,7 +119,7 @@ export function Navbar() {
                   </button>
                   <div className="border-t border-gray-100" />
                   <button
-                    onClick={() => signOut({ redirect: false })}
+                    onClick={() => signOut({ redirectUrl: "/" })}
                     className="flex w-full items-center gap-2 px-4 py-3 text-sm text-gray-700 transition hover:bg-gray-50"
                   >
                     <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,14 +133,14 @@ export function Navbar() {
           ) : (
             <>
               <button
-                onClick={() => open("signin")}
+                onClick={() => openSignIn()}
                 className="text-sm font-medium text-zinc-600 transition hover:text-zinc-900"
               >
                 Sign in
               </button>
               <div className="h-4 w-px bg-zinc-200" />
               <button
-                onClick={() => open("signup")}
+                onClick={() => openSignUp()}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-95"
               >
                 Sign up
@@ -187,7 +186,7 @@ export function Navbar() {
               </a>
             ))}
             <div className="my-2 border-t border-zinc-200" />
-            {session ? (
+            {isSignedIn ? (
               <>
                 <p className="truncate px-3 py-1 text-xs text-gray-400">{email}</p>
                 <button
@@ -197,7 +196,7 @@ export function Navbar() {
                   Settings
                 </button>
                 <button
-                  onClick={() => signOut({ redirect: false })}
+                  onClick={() => signOut({ redirectUrl: "/" })}
                   className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-600 transition hover:bg-zinc-100"
                 >
                   Sign out
@@ -206,13 +205,13 @@ export function Navbar() {
             ) : (
               <>
                 <button
-                  onClick={() => { open("signin"); setMobileMenuOpen(false); }}
+                  onClick={() => { openSignIn(); setMobileMenuOpen(false); }}
                   className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-600 transition hover:bg-zinc-100"
                 >
                   Sign in
                 </button>
                 <button
-                  onClick={() => { open("signup"); setMobileMenuOpen(false); }}
+                  onClick={() => { openSignUp(); setMobileMenuOpen(false); }}
                   className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
                 >
                   Sign up

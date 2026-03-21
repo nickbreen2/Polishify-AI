@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 
 function CheckIcon({ brand }: { brand?: boolean }) {
   return (
@@ -52,8 +51,6 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
       <div className="flex min-h-screen flex-col">
-        <Navbar />
-
         {/* Spacer for fixed nav */}
         <div className="h-[57px]" />
 

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { auth } from "@/auth";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { sql, ensureUsersTable } from "@/lib/db";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.email) {
+  const { userId } = await auth();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -33,19 +33,27 @@ export async function POST(req: NextRequest) {
   try {
     await ensureUsersTable();
 
-    // Ensure there's a users row for this authenticated email (works for OAuth and credentials users).
     let [user] =
-      await sql`SELECT id, stripe_customer_id FROM users WHERE email = ${session.user.email}`;
+      await sql`SELECT id, stripe_customer_id FROM users WHERE clerk_user_id = ${userId}`;
+
     if (!user) {
-      const inserted =
-        await sql`INSERT INTO users (email, password) VALUES (${session.user.email}, '') RETURNING id, stripe_customer_id`;
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress ?? null;
+      const inserted = await sql`
+        INSERT INTO users (clerk_user_id, email)
+        VALUES (${userId}, ${email})
+        ON CONFLICT (email) DO UPDATE SET clerk_user_id = ${userId}
+        RETURNING id, stripe_customer_id
+      `;
       user = inserted[0];
     }
 
     let customerId = user.stripe_customer_id as string | null;
     if (!customerId) {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress ?? undefined;
       const customer = await stripe.customers.create({
-        email: session.user.email,
+        email,
         metadata: { userId: String(user.id) },
       });
       customerId = customer.id;
@@ -72,4 +80,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
