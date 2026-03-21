@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rewrite } from "@/lib/anthropic";
 import { rateLimit } from "@/lib/rate-limit";
-import { auth } from "@/auth";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { sql, ensureUsersTable } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  const userEmail = session?.user?.email;
+  const { userId } = await auth();
 
   const anonUsed = request.cookies.get("polishly_anon_used")?.value === "1";
 
-  if (!userEmail) {
+  if (!userId) {
     if (anonUsed) {
       return NextResponse.json(
         { error: "Sign in to continue polishing." },
@@ -63,20 +62,21 @@ export async function POST(request: NextRequest) {
 
   let user: { id: number; api_used_this_period: number; api_quota_monthly: number } | undefined;
 
-  if (userEmail) {
+  if (userId) {
     await ensureUsersTable();
 
-    // Ensure there's a users row for this authenticated email (works for OAuth and credentials users).
     let [row] =
-      await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE email = ${userEmail}`;
+      await sql`SELECT id, plan, api_quota_monthly, api_used_this_period FROM users WHERE clerk_user_id = ${userId}`;
 
     if (!row) {
-      const inserted =
-        await sql`
-          INSERT INTO users (email, password)
-          VALUES (${userEmail}, NULL)
-          RETURNING id, plan, api_quota_monthly, api_used_this_period
-        `;
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress ?? null;
+      const inserted = await sql`
+        INSERT INTO users (clerk_user_id, email)
+        VALUES (${userId}, ${email})
+        ON CONFLICT (email) DO UPDATE SET clerk_user_id = ${userId}
+        RETURNING id, plan, api_quota_monthly, api_used_this_period
+      `;
       row = inserted[0];
     }
 
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       headers: { "X-RateLimit-Remaining": String(remaining) },
     });
 
-    if (!userEmail) {
+    if (!userId) {
       response.cookies.set("polishly_anon_used", "1", {
         httpOnly: true,
         sameSite: "lax",
