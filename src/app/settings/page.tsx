@@ -136,6 +136,7 @@ export default function SettingsPage() {
   }
 
   const currentPlan = profile?.plan ?? "free";
+  const isPaid = currentPlan === "pro" || currentPlan === "team";
   const used = profile?.api_used_this_period ?? 0;
   const quota = profile?.api_quota_monthly ?? 20;
   const progressPct = Math.min(100, (used / quota) * 100);
@@ -157,8 +158,6 @@ export default function SettingsPage() {
     : null;
 
   const planBadge = PLAN_BADGE[currentPlan] ?? PLAN_BADGE.free;
-
-  const isPaid = currentPlan === "pro" || currentPlan === "team";
 
   function NavItem({ tab, label }: { tab: "settings" | "subscription"; label: string }) {
     return (
