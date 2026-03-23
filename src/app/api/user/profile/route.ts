@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   const rows = await sql`
-    SELECT plan, api_used_this_period, api_quota_monthly, billing_period_ends_at
+    SELECT plan, api_used_this_period, api_quota_monthly, billing_period_ends_at, free_period_ends_at
     FROM users WHERE clerk_user_id = ${userId}
   `;
   const user = rows[0];
@@ -20,5 +20,6 @@ export async function GET() {
     api_used_this_period: user?.api_used_this_period ?? 0,
     api_quota_monthly: user?.api_quota_monthly ?? 20,
     billing_period_ends_at: user?.billing_period_ends_at ?? null,
+    free_period_ends_at: user?.free_period_ends_at ?? null,
   });
 }
