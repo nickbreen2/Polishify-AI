@@ -206,6 +206,13 @@ export default function SettingsPage() {
 
       {/* ── Main content ── */}
       <main className="flex-1 px-4 py-8 md:px-10">
+        {/* Mobile logo */}
+        <div className="mb-5 flex items-center md:hidden">
+          <a href="/">
+            <img src="/Polishify_Full_Logo.png" alt="Polishify" className="h-6 w-auto object-contain" />
+          </a>
+        </div>
+
         {/* Mobile tab strip */}
         <div className="mb-6 flex gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 md:hidden">
           {(["settings", "subscription"] as const).map((tab) => (
@@ -226,7 +233,7 @@ export default function SettingsPage() {
 
         {/* ── SETTINGS TAB ── */}
         {activeTab === "settings" && (
-          <div className="flex max-w-2xl flex-col gap-4">
+          <div className="mx-auto flex max-w-2xl flex-col gap-4">
             {/* Profile card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <p className="text-sm font-semibold text-zinc-900">Profile</p>
@@ -344,7 +351,7 @@ export default function SettingsPage() {
 
         {/* ── SUBSCRIPTION TAB ── */}
         {activeTab === "subscription" && (
-          <div className="flex max-w-3xl flex-col gap-4">
+          <div className="mx-auto flex max-w-3xl flex-col gap-4">
             {/* Current plan card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <div className="flex items-start justify-between gap-4">
