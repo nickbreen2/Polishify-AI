@@ -475,8 +475,8 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Pro */}
-                <div className="relative flex flex-col rounded-xl border-2 border-zinc-900 p-5">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-zinc-900 px-3 py-0.5 text-xs font-semibold text-white">
+                <div className="relative flex flex-col rounded-xl border-2 border-[#456BFF] p-5">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-b from-[#456BFF] to-[#2548D2] px-3 py-0.5 text-xs font-semibold text-white">
                     Most popular
                   </span>
                   <p className="text-xs font-semibold uppercase tracking-widest text-zinc-900">Pro</p>
@@ -508,7 +508,7 @@ export default function SettingsPage() {
                       <button
                         onClick={() => startCheckout("pro")}
                         disabled={loadingPlan !== null}
-                        className="block w-full rounded-xl bg-zinc-900 py-2.5 text-center text-xs font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-60"
+                        className="block w-full rounded-xl bg-gradient-to-b from-[#456BFF] to-[#2548D2] py-2.5 text-center text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
                       >
                         {loadingPlan === "pro" ? "Redirecting…" : "Upgrade to Pro"}
                       </button>
