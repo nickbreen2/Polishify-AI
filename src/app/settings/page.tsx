@@ -147,6 +147,10 @@ export default function SettingsPage() {
       })
     : null;
 
+  const daysLeft = profile?.billing_period_ends_at
+    ? Math.max(0, Math.ceil((new Date(profile.billing_period_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : Math.ceil((new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+
   const planBadge = PLAN_BADGE[currentPlan] ?? PLAN_BADGE.free;
 
   const isPaid = currentPlan === "pro" || currentPlan === "team";
@@ -228,12 +232,10 @@ export default function SettingsPage() {
           ))}
         </div>
 
-        {/* Page title */}
-        <h1 className="mb-6 text-xl font-semibold capitalize text-zinc-900">{activeTab}</h1>
-
         {/* ── SETTINGS TAB ── */}
         {activeTab === "settings" && (
           <div className="mx-auto flex max-w-2xl flex-col gap-4">
+            <h1 className="mb-2 text-xl font-semibold text-zinc-900">Settings</h1>
             {/* Profile card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <p className="text-sm font-semibold text-zinc-900">Profile</p>
@@ -352,6 +354,7 @@ export default function SettingsPage() {
         {/* ── SUBSCRIPTION TAB ── */}
         {activeTab === "subscription" && (
           <div className="mx-auto flex max-w-3xl flex-col gap-4">
+            <h1 className="mb-2 text-xl font-semibold text-zinc-900">Subscription</h1>
             {/* Current plan card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <div className="flex items-start justify-between gap-4">
@@ -402,13 +405,7 @@ export default function SettingsPage() {
                 ) : (
                   <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
                     <div
-                      className={`h-full rounded-full transition-all ${
-                        progressPct >= 90
-                          ? "bg-red-500"
-                          : progressPct >= 70
-                          ? "bg-amber-500"
-                          : "bg-gradient-to-r from-[#456BFF] to-[#2548D2]"
-                      }`}
+                      className="h-full rounded-full bg-gradient-to-r from-[#456BFF] to-[#2548D2] transition-all"
                       style={{ width: `${progressPct}%` }}
                     />
                   </div>
@@ -416,7 +413,8 @@ export default function SettingsPage() {
 
                 {!profileLoading && (
                   <p className="text-xs text-zinc-400">
-                    {renewalDate ? `Resets on ${renewalDate}` : "Resets monthly"}
+                    {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
+                    {renewalDate ? ` · Resets on ${renewalDate}` : " · Resets monthly"}
                   </p>
                 )}
               </div>
