@@ -18,6 +18,12 @@ function CheckIcon() {
   );
 }
 
+const PLAN_BADGE: Record<string, { label: string; classes: string }> = {
+  free: { label: "Free Plan", classes: "bg-zinc-100 text-zinc-600" },
+  pro: { label: "Pro Plan", classes: "bg-blue-100 text-blue-700" },
+  team: { label: "Team Plan", classes: "bg-purple-100 text-purple-700" },
+};
+
 export default function SettingsPage() {
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -43,8 +49,6 @@ export default function SettingsPage() {
 
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState<"pro" | "team" | null>(null);
-
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
 
   useEffect(() => {
     fetch("/api/user/profile")
@@ -130,9 +134,10 @@ export default function SettingsPage() {
     }
   }
 
-  const creditsLeft = profile
-    ? profile.api_quota_monthly - profile.api_used_this_period
-    : null;
+  const currentPlan = profile?.plan ?? "free";
+  const used = profile?.api_used_this_period ?? 0;
+  const quota = profile?.api_quota_monthly ?? 20;
+  const progressPct = Math.min(100, (used / quota) * 100);
 
   const renewalDate = profile?.billing_period_ends_at
     ? new Date(profile.billing_period_ends_at).toLocaleDateString(undefined, {
@@ -142,11 +147,9 @@ export default function SettingsPage() {
       })
     : null;
 
-  const daysUntilRenewal = profile?.billing_period_ends_at
-    ? Math.ceil(
-        (new Date(profile.billing_period_ends_at).getTime() - Date.now()) / 86400000
-      )
-    : null;
+  const planBadge = PLAN_BADGE[currentPlan] ?? PLAN_BADGE.free;
+
+  const isPaid = currentPlan === "pro" || currentPlan === "team";
 
   function NavItem({ tab, label }: { tab: "settings" | "subscription"; label: string }) {
     return (
@@ -164,16 +167,26 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex min-h-screen pt-[57px]">
-      {/* Sidebar — desktop */}
-      <aside className="hidden w-56 shrink-0 flex-col border-r border-zinc-200 bg-white px-3 py-6 md:flex">
-        <p className="px-3 pb-4 text-sm font-semibold text-zinc-900">Account settings</p>
+    <div className="flex min-h-screen bg-[#fafafa]">
+      {/* ── Sidebar ── */}
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-zinc-200 bg-white px-3 py-5 md:flex sticky top-0 h-screen overflow-y-auto">
+        {/* Logo → back to app */}
+        <a href="/" className="mb-5 px-1 block">
+          <img
+            src="/Polishify_Full_Logo.png"
+            alt="Polishify"
+            className="h-6 w-auto object-contain"
+          />
+        </a>
+
+        {/* Nav items */}
         <div className="flex flex-col gap-0.5">
           <NavItem tab="settings" label="Settings" />
           <NavItem tab="subscription" label="Subscription" />
         </div>
-        <div className="flex-1" />
-        <div className="border-t border-zinc-200 pt-3">
+
+        {/* Log out — right below nav */}
+        <div className="mt-4 border-t border-zinc-200 pt-4">
           <button
             onClick={() => signOut({ redirectUrl: "/" })}
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-red-500 transition hover:bg-red-50"
@@ -191,8 +204,8 @@ export default function SettingsPage() {
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 bg-[#fafafa] px-4 py-8 md:px-10">
+      {/* ── Main content ── */}
+      <main className="flex-1 px-4 py-8 md:px-10">
         {/* Mobile tab strip */}
         <div className="mb-6 flex gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 md:hidden">
           {(["settings", "subscription"] as const).map((tab) => (
@@ -208,29 +221,27 @@ export default function SettingsPage() {
           ))}
         </div>
 
-        {/* Page header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-xl font-semibold capitalize text-zinc-900">{activeTab}</h1>
-          <span className="hidden text-sm text-zinc-400 md:block">{email}</span>
-        </div>
+        {/* Page title */}
+        <h1 className="mb-6 text-xl font-semibold capitalize text-zinc-900">{activeTab}</h1>
 
-        {activeTab === "settings" ? (
+        {/* ── SETTINGS TAB ── */}
+        {activeTab === "settings" && (
           <div className="flex max-w-2xl flex-col gap-4">
             {/* Profile card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <p className="text-sm font-semibold text-zinc-900">Profile</p>
               <p className="mt-0.5 text-xs text-zinc-400">Your account information</p>
               <div className="mt-5 flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#456BFF] to-[#2548D2] text-lg font-semibold text-white">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#456BFF] to-[#2548D2] text-base font-semibold text-white">
                   {initial}
                 </div>
                 <div>
                   <p className="text-sm font-medium text-zinc-900">{email}</p>
                   {profileLoading ? (
-                    <div className="mt-1 h-4 w-16 animate-pulse rounded bg-zinc-100" />
+                    <div className="mt-1.5 h-4 w-16 animate-pulse rounded bg-zinc-100" />
                   ) : (
-                    <span className="mt-1 inline-block rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-600">
-                      {profile?.plan ?? "free"} Plan
+                    <span className={`mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${planBadge.classes}`}>
+                      {planBadge.label}
                     </span>
                   )}
                 </div>
@@ -270,8 +281,8 @@ export default function SettingsPage() {
                     {user.externalAccounts.map((account) => (
                       <div key={account.id} className="flex items-center gap-2 text-sm text-zinc-600">
                         <span className="capitalize">{account.provider}</span>
-                        <span className="text-zinc-400">·</span>
-                        <span>{account.emailAddress}</span>
+                        <span className="text-zinc-300">·</span>
+                        <span className="text-zinc-500">{account.emailAddress}</span>
                       </div>
                     ))}
                   </div>
@@ -286,10 +297,12 @@ export default function SettingsPage() {
               <p className="text-sm font-semibold text-red-600">Danger zone</p>
               <p className="mt-0.5 text-xs text-zinc-400">Irreversible and destructive actions</p>
               <div className="mt-5 flex flex-col gap-3">
-                <p className="text-sm font-medium text-zinc-900">Delete account</p>
-                <p className="text-xs text-zinc-500">
-                  Permanently delete your account and all data. This cannot be undone.
-                </p>
+                <div>
+                  <p className="text-sm font-medium text-zinc-900">Delete account</p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Permanently delete your account and all data. This cannot be undone.
+                  </p>
+                </div>
                 {deleteError && <p className="text-xs text-red-500">{deleteError}</p>}
                 {!deleteConfirm ? (
                   <button
@@ -327,49 +340,27 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
-        ) : (
-          /* Subscription tab */
-          <div className="flex max-w-2xl flex-col gap-4">
+        )}
+
+        {/* ── SUBSCRIPTION TAB ── */}
+        {activeTab === "subscription" && (
+          <div className="flex max-w-3xl flex-col gap-4">
             {/* Current plan card */}
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
-              <p className="text-sm font-semibold text-zinc-900">Current plan</p>
-              <p className="mt-0.5 text-xs text-zinc-400">
-                {profile?.plan === "free"
-                  ? "You are on the free plan"
-                  : `You are on the ${profile?.plan} plan`}
-              </p>
-              <div className="mt-5 flex items-center justify-between gap-4">
-                {profileLoading ? (
-                  <div className="h-8 w-48 animate-pulse rounded bg-zinc-100" />
-                ) : (
-                  <p className="text-2xl font-bold text-zinc-900">
-                    {creditsLeft ?? "—"}
-                    <span className="ml-2 text-base font-normal text-zinc-400">
-                      credits left
-                      {daysUntilRenewal !== null
-                        ? ` · renews in ${daysUntilRenewal}d`
-                        : " · Free plan"}
-                      {renewalDate ? ` (${renewalDate})` : ""}
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-900">Current plan</p>
+                  {profileLoading ? (
+                    <div className="mt-1.5 h-4 w-32 animate-pulse rounded bg-zinc-100" />
+                  ) : (
+                    <span className={`mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${planBadge.classes}`}>
+                      {planBadge.label}
                     </span>
-                  </p>
-                )}
+                  )}
+                </div>
 
-                {!profileLoading && profile?.plan === "free" && (
-                  <button
-                    onClick={() => startCheckout("pro")}
-                    disabled={loadingPlan !== null}
-                    className="shrink-0 flex items-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-60"
-                  >
-                    {loadingPlan === "pro" ? "Redirecting…" : "Go Pro"}
-                    {loadingPlan !== "pro" && (
-                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7v10" />
-                      </svg>
-                    )}
-                  </button>
-                )}
-
-                {!profileLoading && (profile?.plan === "pro" || profile?.plan === "team") && (
+                {/* Cancel / cancellation status */}
+                {!profileLoading && isPaid && (
                   cancelSuccess ? (
                     <span className="shrink-0 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-700">
                       Cancellation scheduled
@@ -378,7 +369,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handleCancelSubscription}
                       disabled={cancelLoading}
-                      className="shrink-0 rounded-xl border border-zinc-200 px-4 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 disabled:opacity-60"
+                      className="shrink-0 rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-60"
                     >
                       {cancelLoading ? "Cancelling…" : "Cancel subscription"}
                     </button>
@@ -386,10 +377,47 @@ export default function SettingsPage() {
                 )}
               </div>
 
+              {/* Credits progress */}
+              <div className="mt-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-zinc-500">Polishes used this month</p>
+                  {profileLoading ? (
+                    <div className="h-3 w-20 animate-pulse rounded bg-zinc-100" />
+                  ) : (
+                    <p className="text-xs text-zinc-500">
+                      {used} / {quota}
+                    </p>
+                  )}
+                </div>
+
+                {profileLoading ? (
+                  <div className="h-2 w-full animate-pulse rounded-full bg-zinc-100" />
+                ) : (
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        progressPct >= 90
+                          ? "bg-red-500"
+                          : progressPct >= 70
+                          ? "bg-amber-500"
+                          : "bg-gradient-to-r from-[#456BFF] to-[#2548D2]"
+                      }`}
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                )}
+
+                {!profileLoading && (
+                  <p className="text-xs text-zinc-400">
+                    {renewalDate ? `Resets on ${renewalDate}` : "Resets monthly"}
+                  </p>
+                )}
+              </div>
+
               {cancelError && <p className="mt-3 text-xs text-red-500">{cancelError}</p>}
-              {cancelSuccess && (
-                <p className="mt-3 text-xs text-zinc-500">
-                  Your subscription will be cancelled at the end of the billing period. You&apos;ll keep access until then.
+              {cancelSuccess && renewalDate && (
+                <p className="mt-3 text-xs text-zinc-400">
+                  You&apos;ll keep access until {renewalDate}, then your plan resets to Free.
                 </p>
               )}
             </div>
@@ -398,35 +426,8 @@ export default function SettingsPage() {
             <div className="rounded-xl border border-zinc-200 bg-white p-6">
               <p className="text-sm font-semibold text-zinc-900">Upgrade your plan</p>
               <p className="mt-0.5 text-xs text-zinc-400">
-                Get unlimited access to all models and features
+                Get more polishes and access to all models
               </p>
-
-              {/* Billing toggle */}
-              <div className="mt-5 flex w-fit items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1">
-                <button
-                  onClick={() => setBillingPeriod("monthly")}
-                  className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                    billingPeriod === "monthly"
-                      ? "bg-white text-zinc-900 shadow-sm"
-                      : "text-zinc-500"
-                  }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => setBillingPeriod("annual")}
-                  className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition ${
-                    billingPeriod === "annual"
-                      ? "bg-white text-zinc-900 shadow-sm"
-                      : "text-zinc-500"
-                  }`}
-                >
-                  Annual
-                  <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-xs font-semibold text-green-700">
-                    35% OFF
-                  </span>
-                </button>
-              </div>
 
               {checkoutError && (
                 <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
@@ -434,14 +435,14 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {/* Plan cards */}
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {/* Plan cards — 3 columns */}
+              <div className="mt-5 grid gap-4 sm:grid-cols-3">
                 {/* Free */}
                 <div className="flex flex-col rounded-xl border border-zinc-200 p-5">
-                  <p className="text-sm font-semibold text-zinc-900">Free</p>
-                  <div className="mt-2 flex items-end gap-1">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Free</p>
+                  <div className="mt-3 flex items-end gap-1">
                     <span className="text-3xl font-bold text-zinc-900">$0</span>
-                    <span className="mb-1 text-xs text-zinc-400">/ month</span>
+                    <span className="mb-1 text-xs text-zinc-400">/mo</span>
                   </div>
                   <ul className="mt-4 flex flex-col gap-2 text-xs text-zinc-600">
                     {[
@@ -457,8 +458,8 @@ export default function SettingsPage() {
                     ))}
                   </ul>
                   <div className="mt-auto pt-6">
-                    <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-sm font-medium text-zinc-400">
-                      {profile?.plan === "free" ? "Current plan" : "Free plan"}
+                    <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-xs font-medium text-zinc-400">
+                      {currentPlan === "free" ? "Current plan" : "—"}
                     </div>
                   </div>
                 </div>
@@ -466,25 +467,21 @@ export default function SettingsPage() {
                 {/* Pro */}
                 <div className="relative flex flex-col rounded-xl border-2 border-zinc-900 p-5">
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-zinc-900 px-3 py-0.5 text-xs font-semibold text-white">
-                    MOST POPULAR
+                    Most popular
                   </span>
-                  <p className="text-sm font-semibold text-zinc-900">Pro</p>
-                  <div className="mt-2 flex items-end gap-1">
-                    <span className="text-3xl font-bold text-zinc-900">
-                      ${billingPeriod === "annual" ? "6" : "9"}
-                    </span>
-                    <span className="mb-1 text-xs text-zinc-400">/ month</span>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-900">Pro</p>
+                  <div className="mt-3 flex items-end gap-1">
+                    <span className="text-3xl font-bold text-zinc-900">$9</span>
+                    <span className="mb-1 text-xs text-zinc-400">/mo</span>
                   </div>
-                  {billingPeriod === "annual" && (
-                    <p className="text-xs text-zinc-400">Billed annually ($72/year)</p>
-                  )}
                   <ul className="mt-4 flex flex-col gap-2 text-xs text-zinc-600">
                     {[
                       "200 polishes / month",
+                      "General writing",
+                      "Prompt engineering",
+                      "Chrome extension",
                       "All models (GPT-4o, Claude, Grok)",
-                      "Advanced page analysis",
-                      "Priority support",
-                      "Early access to new features",
+                      "Priority AI processing",
                     ].map((f) => (
                       <li key={f} className="flex items-center gap-1.5">
                         <CheckIcon />
@@ -493,17 +490,56 @@ export default function SettingsPage() {
                     ))}
                   </ul>
                   <div className="mt-auto pt-6">
-                    {profile?.plan === "pro" ? (
-                      <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-sm font-medium text-zinc-400">
+                    {currentPlan === "pro" ? (
+                      <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-xs font-medium text-zinc-400">
                         Current plan
                       </div>
                     ) : (
                       <button
                         onClick={() => startCheckout("pro")}
                         disabled={loadingPlan !== null}
-                        className="block w-full rounded-xl bg-zinc-900 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-60"
+                        className="block w-full rounded-xl bg-zinc-900 py-2.5 text-center text-xs font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-60"
                       >
-                        {loadingPlan === "pro" ? "Redirecting…" : "Buy"}
+                        {loadingPlan === "pro" ? "Redirecting…" : "Upgrade to Pro"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Team */}
+                <div className="flex flex-col rounded-xl border border-zinc-200 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Team</p>
+                  <div className="mt-3 flex items-end gap-1">
+                    <span className="text-3xl font-bold text-zinc-900">$29</span>
+                    <span className="mb-1 text-xs text-zinc-400">/mo</span>
+                  </div>
+                  <ul className="mt-4 flex flex-col gap-2 text-xs text-zinc-600">
+                    {[
+                      "800 polishes / month",
+                      "Everything in Pro",
+                      "Up to 10 seats",
+                      "Shared usage dashboard",
+                      "Team billing",
+                      "Priority support",
+                    ].map((f) => (
+                      <li key={f} className="flex items-center gap-1.5">
+                        <CheckIcon />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto pt-6">
+                    {currentPlan === "team" ? (
+                      <div className="block w-full rounded-xl border border-zinc-200 py-2.5 text-center text-xs font-medium text-zinc-400">
+                        Current plan
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => startCheckout("team")}
+                        disabled={loadingPlan !== null}
+                        className="block w-full rounded-xl border border-zinc-300 py-2.5 text-center text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-60"
+                      >
+                        {loadingPlan === "team" ? "Redirecting…" : "Upgrade to Team"}
                       </button>
                     )}
                   </div>
