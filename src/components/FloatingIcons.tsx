@@ -29,10 +29,12 @@ const ICONS: FloatIcon[] = [
 
 function FloatingIcon({
   icon,
+  index,
   mouseX,
   mouseY,
 }: {
   icon: FloatIcon;
+  index: number;
   mouseX: React.MutableRefObject<number>;
   mouseY: React.MutableRefObject<number>;
 }) {
@@ -72,6 +74,9 @@ function FloatingIcon({
     <motion.div
       ref={ref}
       style={{ ...icon.style, x: springX, y: springY, position: "absolute" }}
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.3 + index * 0.1 }}
     >
       <div
         className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/50 bg-white/25 p-3 shadow-lg backdrop-blur-md"
@@ -106,8 +111,8 @@ export function FloatingIcons() {
 
   return (
     <div className="pointer-events-none absolute inset-0 hidden xl:block">
-      {ICONS.map((icon) => (
-        <FloatingIcon key={icon.name} icon={icon} mouseX={mouseX} mouseY={mouseY} />
+      {ICONS.map((icon, i) => (
+        <FloatingIcon key={icon.name} icon={icon} index={i} mouseX={mouseX} mouseY={mouseY} />
       ))}
     </div>
   );
