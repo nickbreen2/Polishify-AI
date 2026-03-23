@@ -22,6 +22,7 @@ export async function ensureUsersTable() {
       ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'free',
       ADD COLUMN IF NOT EXISTS api_quota_monthly INT NOT NULL DEFAULT 20,
       ADD COLUMN IF NOT EXISTS api_used_this_period INT NOT NULL DEFAULT 0,
-      ADD COLUMN IF NOT EXISTS billing_period_ends_at TIMESTAMPTZ;
+      ADD COLUMN IF NOT EXISTS billing_period_ends_at TIMESTAMPTZ,
+      ADD COLUMN IF NOT EXISTS free_period_ends_at TIMESTAMPTZ;
   `;
 }

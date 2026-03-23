@@ -72,8 +72,8 @@ export async function POST(request: NextRequest) {
       const clerkUser = await currentUser();
       const email = clerkUser?.emailAddresses[0]?.emailAddress ?? null;
       const inserted = await sql`
-        INSERT INTO users (clerk_user_id, email)
-        VALUES (${userId}, ${email})
+        INSERT INTO users (clerk_user_id, email, free_period_ends_at)
+        VALUES (${userId}, ${email}, NOW() + INTERVAL '30 days')
         ON CONFLICT (email) DO UPDATE SET clerk_user_id = ${userId}
         RETURNING id, plan, api_quota_monthly, api_used_this_period
       `;

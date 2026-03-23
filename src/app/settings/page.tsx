@@ -8,6 +8,7 @@ type UserProfile = {
   api_used_this_period: number;
   api_quota_monthly: number;
   billing_period_ends_at: string | null;
+  free_period_ends_at: string | null;
 };
 
 function CheckIcon() {
@@ -139,17 +140,21 @@ export default function SettingsPage() {
   const quota = profile?.api_quota_monthly ?? 20;
   const progressPct = Math.min(100, (used / quota) * 100);
 
-  const renewalDate = profile?.billing_period_ends_at
-    ? new Date(profile.billing_period_ends_at).toLocaleDateString(undefined, {
+  const periodEndsAt = isPaid
+    ? profile?.billing_period_ends_at
+    : profile?.free_period_ends_at;
+
+  const renewalDate = periodEndsAt
+    ? new Date(periodEndsAt).toLocaleDateString(undefined, {
         month: "short",
         day: "numeric",
         year: "numeric",
       })
     : null;
 
-  const daysLeft = profile?.billing_period_ends_at
-    ? Math.max(0, Math.ceil((new Date(profile.billing_period_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : Math.ceil((new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const daysLeft = periodEndsAt
+    ? Math.max(0, Math.ceil((new Date(periodEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   const planBadge = PLAN_BADGE[currentPlan] ?? PLAN_BADGE.free;
 
@@ -413,8 +418,9 @@ export default function SettingsPage() {
 
                 {!profileLoading && (
                   <p className="text-xs text-zinc-400">
-                    {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
-                    {renewalDate ? ` · Resets on ${renewalDate}` : " · Resets monthly"}
+                    {daysLeft !== null
+                      ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left · Resets on ${renewalDate}`
+                      : "Resets monthly"}
                   </p>
                 )}
               </div>
