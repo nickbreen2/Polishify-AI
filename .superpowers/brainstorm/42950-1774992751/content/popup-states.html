@@ -1,0 +1,126 @@
+<h2>Popup state flow</h2>
+<p class="subtitle">The 4 states the popup moves through. Does this match your mental model?</p>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-family:system-ui;">
+
+  <!-- State 1: Widget inactive -->
+  <div style="flex:0 0 180px;">
+    <div style="background:#1a1a2e;border-radius:12px;padding:12px;min-height:160px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid #2a2a3e;">
+      <div style="background:#2d2d4e;border-radius:8px;padding:9px;display:flex;align-items:center;gap:6px;border:1px solid #333;">
+        <span style="color:#555;font-size:10px;flex:1;">Start typing...</span>
+        <div style="width:20px;height:20px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;opacity:0.35;">
+          <span style="color:#888;font-size:8px;">✦</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <span style="background:#2a2a3e;color:#666;font-size:10px;padding:3px 10px;border-radius:20px;">① No text</span>
+      <p style="color:#555;font-size:11px;margin-top:4px;">Widget faded, not clickable</p>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div style="display:flex;align-items:center;color:#444;font-size:20px;padding-top:0;">→</div>
+
+  <!-- State 2: Widget active, popup loading -->
+  <div style="flex:0 0 180px;">
+    <div style="background:#1a1a2e;border-radius:12px;padding:12px;min-height:160px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid #2a2a3e;">
+      <!-- Loading popup -->
+      <div style="background:#23233d;border:1px solid #6c63ff;border-radius:10px;padding:12px;margin-bottom:8px;box-shadow:0 -4px 16px rgba(108,99,255,0.2);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+          <span style="color:#9d96ff;font-size:10px;font-weight:700;">POLISHING...</span>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;padding:8px 0;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#6c63ff;animation:pulse 1s ease-in-out infinite;"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:#6c63ff;opacity:0.6;animation:pulse 1s ease-in-out 0.2s infinite;"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:#6c63ff;opacity:0.3;animation:pulse 1s ease-in-out 0.4s infinite;"></div>
+        </div>
+      </div>
+      <div style="background:#2d2d4e;border-radius:8px;padding:9px;display:flex;align-items:center;gap:6px;border:1px solid #333;">
+        <span style="color:#888;font-size:10px;flex:1;">Hey can u help me...</span>
+        <div style="width:20px;height:20px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-size:8px;">✦</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <span style="background:#2a2a3e;color:#9d96ff;font-size:10px;padding:3px 10px;border-radius:20px;">② Loading</span>
+      <p style="color:#555;font-size:11px;margin-top:4px;">Popup open, API in flight</p>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div style="display:flex;align-items:center;color:#444;font-size:20px;">→</div>
+
+  <!-- State 3: Result shown -->
+  <div style="flex:0 0 180px;">
+    <div style="background:#1a1a2e;border-radius:12px;padding:12px;min-height:160px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid #2a2a3e;">
+      <div style="background:#23233d;border:1px solid #6c63ff;border-radius:10px;padding:12px;margin-bottom:8px;box-shadow:0 -4px 16px rgba(108,99,255,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:700;">POLISHED</span>
+          </div>
+          <span style="color:#444;font-size:11px;cursor:pointer;">✕</span>
+        </div>
+        <div style="color:#e0e0ff;font-size:10px;line-height:1.5;margin-bottom:10px;">Could you assist me in understanding this concept?</div>
+        <div style="display:flex;gap:5px;justify-content:flex-end;">
+          <button style="background:#6c63ff;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:600;">Apply</button>
+          <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:6px;padding:5px 10px;font-size:10px;">Copy</button>
+          <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:6px;padding:5px 10px;font-size:10px;">Edit</button>
+        </div>
+      </div>
+      <div style="background:#2d2d4e;border-radius:8px;padding:9px;display:flex;align-items:center;gap:6px;border:1px solid #333;">
+        <span style="color:#888;font-size:10px;flex:1;">Hey can u help me...</span>
+        <div style="width:20px;height:20px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-size:8px;">✦</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <span style="background:#2a2a3e;color:#6c63ff;font-size:10px;padding:3px 10px;border-radius:20px;">③ Result</span>
+      <p style="color:#555;font-size:11px;margin-top:4px;">Apply / Copy / Edit</p>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div style="display:flex;align-items:center;color:#444;font-size:20px;">→</div>
+
+  <!-- State 4: Edit mode -->
+  <div style="flex:0 0 180px;">
+    <div style="background:#1a1a2e;border-radius:12px;padding:12px;min-height:160px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid #2a2a3e;">
+      <div style="background:#23233d;border:1px solid #6c63ff;border-radius:10px;padding:12px;margin-bottom:8px;box-shadow:0 -4px 16px rgba(108,99,255,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:700;">EDIT</span>
+          </div>
+          <span style="color:#444;font-size:11px;cursor:pointer;">✕</span>
+        </div>
+        <div style="background:#1a1a2e;border:1px solid #6c63ff;border-radius:6px;padding:8px;font-size:10px;color:#e0e0ff;line-height:1.5;margin-bottom:10px;min-height:36px;">
+          Could you assist me in understanding this concept?<span style="display:inline-block;width:1px;height:11px;background:#6c63ff;margin-left:1px;vertical-align:text-bottom;"></span>
+        </div>
+        <div style="display:flex;gap:5px;justify-content:flex-end;">
+          <button style="background:#6c63ff;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:600;">Apply</button>
+          <button style="background:transparent;color:#555;border:1px solid #333;border-radius:6px;padding:5px 10px;font-size:10px;">Cancel</button>
+        </div>
+      </div>
+      <div style="background:#2d2d4e;border-radius:8px;padding:9px;display:flex;align-items:center;gap:6px;border:1px solid #333;">
+        <span style="color:#888;font-size:10px;flex:1;">Hey can u help me...</span>
+        <div style="width:20px;height:20px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-size:8px;">✦</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:8px;">
+      <span style="background:#2a2a3e;color:#9d96ff;font-size:10px;padding:3px 10px;border-radius:20px;">④ Edit mode</span>
+      <p style="color:#555;font-size:11px;margin-top:4px;">Text editable, Cancel reverts</p>
+    </div>
+  </div>
+
+</div>
+
+<style>
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>

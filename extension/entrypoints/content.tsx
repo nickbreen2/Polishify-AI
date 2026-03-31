@@ -216,7 +216,31 @@ export default defineContentScript({
         "position:absolute;top:0;left:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483646;";
     }
 
+    // Separate host for the popup — stays on document.body and is NEVER re-parented.
+    // This ensures popup position: absolute coords are always relative to the viewport
+    // origin (0,0), regardless of CSS transforms on the input container.
+    const popupHost = document.createElement("div");
+    popupHost.id = "polishify-popup-root";
+    popupHost.style.cssText =
+      "position:fixed;top:0;left:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483647;";
+    document.body.appendChild(popupHost);
+
+    const popupShadow = popupHost.attachShadow({ mode: "open" });
+
+    const popupStyle = document.createElement("style");
+    popupStyle.textContent = `
+      @keyframes polishify-dot-pulse {
+        0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+        40%           { opacity: 1;   transform: scale(1); }
+      }
+    `;
+    popupShadow.appendChild(popupStyle);
+
+    const popupDiv = document.createElement("div");
+    popupDiv.style.cssText = "position:absolute;top:0;left:0;width:0;height:0;overflow:visible;";
+    popupShadow.appendChild(popupDiv);
+
     const widgetRoot = createRoot(widgetDiv);
-    widgetRoot.render(<WidgetContainer onContainerReady={adoptIntoContainer} />);
+    widgetRoot.render(<WidgetContainer onContainerReady={adoptIntoContainer} popupContainer={popupDiv} />);
   },
 });

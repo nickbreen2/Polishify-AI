@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { detectPlatform } from '@/lib/adapters';
 import type { PlatformAdapter } from '@/lib/adapters';
 import type { PolishRequest, PolishResponse, PolishError } from '@/lib/types';
@@ -67,15 +68,17 @@ function computeViewportPosition(adapter: PlatformAdapter): { top: number; left:
 
 interface WidgetContainerProps {
   onContainerReady?: (container: HTMLElement) => void;
+  popupContainer: HTMLElement;
 }
 
-export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
+export function WidgetContainer({ onContainerReady, popupContainer }: WidgetContainerProps) {
   const [adapter, setAdapter] = useState<PlatformAdapter | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [polishedText, setPolishedText] = useState<string | null>(null);
+  const [viewportPos, setViewportPos] = useState<{ top: number; left: number } | null>(null);
 
   // Phase 1: detect platform and wait for input element (handles SPA navigation).
   // When the input element is found, locate the rounded outer container and call
@@ -124,6 +127,8 @@ export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
     let rafId: number;
     let lastTop = -1;
     let lastLeft = -1;
+    let lastVpTop = -1;
+    let lastVpLeft = -1;
 
     const tick = () => {
       const container = containerRef.current;
@@ -137,6 +142,17 @@ export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
         lastLeft = left;
         setPosition(pos ?? null);
       }
+
+      // Track viewport-absolute position for the popup (needs fixed positioning to avoid clipping)
+      const vp = computeViewportPosition(adapter);
+      const vpTop = vp?.top ?? -1;
+      const vpLeft = vp?.left ?? -1;
+      if (vpTop !== lastVpTop || vpLeft !== lastVpLeft) {
+        lastVpTop = vpTop;
+        lastVpLeft = vpLeft;
+        setViewportPos(vp ?? null);
+      }
+
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -193,14 +209,15 @@ export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
         position={position}
         isAbsolute={containerRef.current !== null}
       />
-      {popupOpen && (
+      {popupOpen && viewportPos && createPortal(
         <PolishPopup
           polishedText={polishedText}
-          position={position}
+          position={viewportPos}
           onApply={handleApply}
           onCopy={handleCopy}
           onDismiss={handleDismiss}
-        />
+        />,
+        popupContainer,
       )}
     </>
   );

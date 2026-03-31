@@ -53,7 +53,7 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
 
   const wrapStyle: CSSProperties = {
     position: 'absolute',
-    // Right-align popup with the widget button
+    // Right-align popup with the widget button (host is fixed at 0,0 so these are viewport coords)
     left: position.left + WIDGET_SIZE - POPUP_WIDTH,
     // Place above the widget; transform pushes it fully above
     top: position.top,
@@ -182,6 +182,7 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
           style={{
             width: '100%',
             minHeight: 80,
+            maxHeight: 180,
             background: COLORS.inputBg,
             border: `1px solid ${COLORS.border}`,
             borderRadius: 8,
@@ -204,12 +205,20 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
   }
 
   // state === 'result'
+  const isAuthError = polishedText?.toLowerCase().includes('sign in') ?? false;
+  const isLimitError = polishedText?.toLowerCase().includes('limit') ?? false;
+  const displayText = polishedText?.replace(/^Error:\s*/i, '') ?? '';
+
+  let headerLabel = 'Polished';
+  if (isAuthError) headerLabel = 'Sign in required';
+  else if (isLimitError) headerLabel = 'Limit reached';
+
   return (
     <div style={wrapStyle}>
       <div style={headerStyle}>
         <div style={labelStyle}>
           <div style={dotIndicatorStyle} />
-          Polished
+          {headerLabel}
         </div>
         <button style={dismissBtnStyle} onClick={onDismiss} title="Dismiss">✕</button>
       </div>
@@ -218,22 +227,42 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
           color: COLORS.text,
           fontSize: 12,
           lineHeight: 1.6,
+          maxHeight: 180,
+          overflowY: 'auto',
         }}
       >
-        {polishedText}
+        {displayText}
       </div>
       <div style={actionsStyle}>
-        <button style={btnPrimary} onClick={() => onApply(polishedText!)}>Apply</button>
-        <button style={btnSecondary} onClick={() => onCopy(polishedText!)}>Copy</button>
-        <button
-          style={btnSecondary}
-          onClick={() => {
-            setEditText(polishedText!);
-            setState('edit');
-          }}
-        >
-          Edit
-        </button>
+        {isAuthError ? (
+          <button
+            style={btnPrimary}
+            onClick={() => window.open('https://polishify.app/sign-in', '_blank')}
+          >
+            Sign in
+          </button>
+        ) : isLimitError ? (
+          <button
+            style={btnPrimary}
+            onClick={() => window.open('https://polishify.app/pricing', '_blank')}
+          >
+            Upgrade
+          </button>
+        ) : (
+          <>
+            <button style={btnPrimary} onClick={() => onApply(polishedText!)}>Apply</button>
+            <button style={btnSecondary} onClick={() => onCopy(polishedText!)}>Copy</button>
+            <button
+              style={btnSecondary}
+              onClick={() => {
+                setEditText(polishedText!);
+                setState('edit');
+              }}
+            >
+              Edit
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
