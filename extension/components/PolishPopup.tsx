@@ -37,6 +37,7 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
       setState('result');
     } else {
       setState('loading');
+      setEditText('');
     }
   }, [polishedText]);
 

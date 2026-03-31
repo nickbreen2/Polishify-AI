@@ -196,7 +196,7 @@ export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
       {popupOpen && (
         <PolishPopup
           polishedText={polishedText}
-          position={position!}
+          position={position}
           onApply={handleApply}
           onCopy={handleCopy}
           onDismiss={handleDismiss}
