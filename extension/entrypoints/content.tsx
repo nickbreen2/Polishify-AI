@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { Popover } from "@/components/Popover";
+import { WidgetContainer } from "@/components/WidgetContainer";
 import type {
   TriggerPolish,
   PolishRequest,
@@ -174,5 +175,72 @@ export default defineContentScript({
         cleanup();
       }
     });
+
+    // ── Floating widget overlay ──────────────────────────────────────────────
+    const widgetHost = document.createElement("div");
+    widgetHost.id = "polishify-widget-root";
+    widgetHost.style.cssText =
+      "position:fixed;top:0;left:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483646;";
+    document.body.appendChild(widgetHost);
+
+    const widgetShadow = widgetHost.attachShadow({ mode: "open" });
+
+    // Keyframe animation lives here so PolishWidget can reference it by name
+    const widgetStyle = document.createElement("style");
+    widgetStyle.textContent = `
+      @keyframes polishify-pulse {
+        0%, 100% { box-shadow: 0 2px 8px rgba(99,102,241,0.45), 0 0 0 0 rgba(99,102,241,0.3); }
+        50%       { box-shadow: 0 2px 8px rgba(99,102,241,0.45), 0 0 0 6px rgba(99,102,241,0); }
+      }
+      @keyframes polishify-dot-pulse {
+        0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+        40%           { opacity: 1;   transform: scale(1); }
+      }
+    `;
+    widgetShadow.appendChild(widgetStyle);
+
+    const widgetDiv = document.createElement("div");
+    widgetDiv.style.cssText = "position:absolute;top:0;left:0;width:0;height:0;overflow:visible;";
+    widgetShadow.appendChild(widgetDiv);
+
+    // Called by WidgetContainer once it locates the rounded input container.
+    // We re-parent the shadow host into that element so the widget moves with
+    // it natively (scroll, layout shifts) — no JS position tracking needed.
+    function adoptIntoContainer(container: HTMLElement) {
+      const computed = window.getComputedStyle(container);
+      if (computed.position === "static") {
+        container.style.position = "relative";
+      }
+      container.appendChild(widgetHost);
+      widgetHost.style.cssText =
+        "position:absolute;top:0;left:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483646;";
+    }
+
+    // Separate host for the popup — stays on document.body and is NEVER re-parented.
+    // This ensures popup position: absolute coords are always relative to the viewport
+    // origin (0,0), regardless of CSS transforms on the input container.
+    const popupHost = document.createElement("div");
+    popupHost.id = "polishify-popup-root";
+    popupHost.style.cssText =
+      "position:fixed;top:0;left:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:2147483647;";
+    document.body.appendChild(popupHost);
+
+    const popupShadow = popupHost.attachShadow({ mode: "open" });
+
+    const popupStyle = document.createElement("style");
+    popupStyle.textContent = `
+      @keyframes polishify-dot-pulse {
+        0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+        40%           { opacity: 1;   transform: scale(1); }
+      }
+    `;
+    popupShadow.appendChild(popupStyle);
+
+    const popupDiv = document.createElement("div");
+    popupDiv.style.cssText = "position:absolute;top:0;left:0;width:0;height:0;overflow:visible;";
+    popupShadow.appendChild(popupDiv);
+
+    const widgetRoot = createRoot(widgetDiv);
+    widgetRoot.render(<WidgetContainer onContainerReady={adoptIntoContainer} popupContainer={popupDiv} />);
   },
 });

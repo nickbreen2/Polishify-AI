@@ -1,0 +1,99 @@
+<h2>Which button set for the popup?</h2>
+<p class="subtitle">All versions use the anchored-above-input popup. Pick the action set that feels right.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:14px;font-family:system-ui;">
+        <!-- Popup -->
+        <div style="background:#23233d;border:1px solid #6c63ff;border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 -4px 20px rgba(108,99,255,0.25);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:700;letter-spacing:0.5px;">POLISHED</span>
+          </div>
+          <div style="color:#e0e0ff;font-size:12px;line-height:1.6;margin-bottom:12px;">Could you assist me in understanding this concept? I'd appreciate a clear explanation.</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button style="background:#6c63ff;color:white;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">✦ Apply</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;">Copy</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <!-- Input box -->
+        <div style="background:#2d2d4e;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;border:1px solid #333;">
+          <span style="color:#888;font-size:11px;flex:1;">Hey can u help me with somthing</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:9px;font-weight:bold;">✦</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Apply · Copy · Edit</h3>
+      <p><strong>Apply</strong> replaces prompt with polished text. <strong>Copy</strong> puts it in clipboard. <strong>Edit</strong> lets you tweak before applying. Best of all worlds.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:14px;font-family:system-ui;">
+        <!-- Popup -->
+        <div style="background:#23233d;border:1px solid #6c63ff;border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 -4px 20px rgba(108,99,255,0.25);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:700;letter-spacing:0.5px;">POLISHED</span>
+          </div>
+          <div style="color:#e0e0ff;font-size:12px;line-height:1.6;margin-bottom:12px;">Could you assist me in understanding this concept? I'd appreciate a clear explanation.</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button style="background:#6c63ff;color:white;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">✦ Apply</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+        <!-- Input box -->
+        <div style="background:#2d2d4e;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;border:1px solid #333;">
+          <span style="color:#888;font-size:11px;flex:1;">Hey can u help me with somthing</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:9px;font-weight:bold;">✦</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Apply · Edit (streamlined)</h3>
+      <p><strong>Apply</strong> instantly replaces the prompt. <strong>Edit</strong> opens it for tweaking first. Clipboard users can just copy from the popup text manually. Cleaner UI.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:14px;font-family:system-ui;">
+        <!-- Popup -->
+        <div style="background:#23233d;border:1px solid #6c63ff;border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 -4px 20px rgba(108,99,255,0.25);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:700;letter-spacing:0.5px;">POLISHED</span>
+          </div>
+          <!-- Editable polished text field -->
+          <div style="background:#1a1a2e;border:1px solid #4a4a6a;border-radius:8px;padding:10px;font-size:12px;color:#e0e0ff;line-height:1.6;margin-bottom:12px;min-height:50px;">
+            Could you assist me in understanding this concept? I'd appreciate a clear explanation.
+            <div style="display:inline-block;width:1px;height:13px;background:#6c63ff;margin-left:2px;animation:blink 1s step-end infinite;vertical-align:text-bottom;"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button style="background:#6c63ff;color:white;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">✦ Apply</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #4a4a6a;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;">Copy</button>
+          </div>
+        </div>
+        <!-- Input box -->
+        <div style="background:#2d2d4e;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;border:1px solid #333;">
+          <span style="color:#888;font-size:11px;flex:1;">Hey can u help me with somthing</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:9px;font-weight:bold;">✦</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Always-editable + Apply · Copy</h3>
+      <p>Polished text is always editable in-popup — no separate "Edit mode." User tweaks inline, then hits Apply or Copy. Most flexible but adds visual complexity.</p>
+    </div>
+  </div>
+</div>

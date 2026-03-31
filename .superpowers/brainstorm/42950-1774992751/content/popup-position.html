@@ -1,0 +1,121 @@
+<h2>Where should the popup appear?</h2>
+<p class="subtitle">When the user clicks the Polishify widget button, where should the polished result popup show up?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:16px;font-family:system-ui;min-height:200px;display:flex;flex-direction:column;gap:10px;">
+        <!-- Fake chat messages -->
+        <div style="background:#2d2d4e;border-radius:8px;padding:10px;font-size:12px;color:#aaa;align-self:flex-end;max-width:70%;">Hey, can you help me with something?</div>
+        <div style="background:#3d3d5c;border-radius:8px;padding:10px;font-size:12px;color:#ccc;align-self:flex-start;max-width:70%;">Of course! What do you need?</div>
+
+        <!-- Popup anchored above input -->
+        <div style="background:#2a2a45;border:1px solid #6c63ff;border-radius:12px;padding:14px;box-shadow:0 -4px 20px rgba(108,99,255,0.3);margin-top:auto;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#6c63ff;"></div>
+            <span style="color:#9d96ff;font-size:10px;font-weight:600;letter-spacing:0.5px;">POLISHED VERSION</span>
+          </div>
+          <div style="color:#e0e0ff;font-size:11px;line-height:1.5;">Could you assist me in understanding this concept? I'd appreciate a clear explanation.</div>
+          <div style="display:flex;gap:6px;margin-top:10px;">
+            <button style="background:#6c63ff;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Apply</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Copy</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+
+        <!-- Input box -->
+        <div style="background:#2d2d4e;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;border:1px solid #444;">
+          <span style="color:#666;font-size:11px;flex:1;">Hey can u help me with somthing</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:9px;">✦</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Anchored above input</h3>
+      <p>Popup floats just above the text input box, anchored to the widget button. Stays near the action, minimal context switch.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:16px;font-family:system-ui;min-height:200px;display:flex;flex-direction:column;gap:10px;position:relative;">
+        <!-- Fake chat messages -->
+        <div style="background:#2d2d4e;border-radius:8px;padding:10px;font-size:12px;color:#aaa;align-self:flex-end;max-width:70%;">Hey, can you help me with something?</div>
+        <div style="background:#3d3d5c;border-radius:8px;padding:10px;font-size:12px;color:#ccc;align-self:flex-start;max-width:70%;">Of course! What do you need?</div>
+
+        <!-- Centered modal overlay -->
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+          <div style="background:#2a2a45;border:1px solid #6c63ff;border-radius:14px;padding:18px;width:80%;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:8px;height:8px;border-radius:50%;background:#6c63ff;"></div>
+                <span style="color:#9d96ff;font-size:10px;font-weight:600;">POLISHED VERSION</span>
+              </div>
+              <span style="color:#666;font-size:14px;cursor:pointer;">✕</span>
+            </div>
+            <div style="color:#e0e0ff;font-size:11px;line-height:1.5;margin-bottom:12px;">Could you assist me in understanding this concept? I'd appreciate a clear explanation.</div>
+            <div style="display:flex;gap:6px;">
+              <button style="background:#6c63ff;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:11px;">Apply</button>
+              <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;">Copy</button>
+              <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input box -->
+        <div style="background:#2d2d4e;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px;border:1px solid #444;margin-top:auto;">
+          <span style="color:#666;font-size:11px;flex:1;">Hey can u help me with somthing</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;">
+            <span style="color:white;font-size:9px;">✦</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Centered modal overlay</h3>
+      <p>Popup appears as a centered modal over the chat. More prominent, easier to read. Feels like a deliberate action.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:12px;padding:16px;font-family:system-ui;min-height:200px;display:flex;flex-direction:column;gap:10px;">
+        <!-- Fake chat messages -->
+        <div style="background:#2d2d4e;border-radius:8px;padding:10px;font-size:12px;color:#aaa;align-self:flex-end;max-width:70%;">Hey, can you help me with something?</div>
+        <div style="background:#3d3d5c;border-radius:8px;padding:10px;font-size:12px;color:#ccc;align-self:flex-start;max-width:70%;">Of course! What do you need?</div>
+
+        <!-- Slide-up panel replacing/expanding the input area -->
+        <div style="margin-top:auto;background:#2a2a45;border:1px solid #6c63ff;border-radius:12px;padding:14px;box-shadow:0 0 20px rgba(108,99,255,0.25);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#6c63ff;"></div>
+              <span style="color:#9d96ff;font-size:10px;font-weight:600;">POLISHED VERSION</span>
+            </div>
+            <span style="color:#555;font-size:10px;">dismiss ✕</span>
+          </div>
+          <!-- Original -->
+          <div style="background:#1e1e35;border-radius:6px;padding:8px;font-size:10px;color:#666;margin-bottom:6px;">
+            <span style="color:#555;font-size:9px;display:block;margin-bottom:3px;">ORIGINAL</span>
+            Hey can u help me with somthing
+          </div>
+          <!-- Polished -->
+          <div style="background:#252540;border-radius:6px;padding:8px;font-size:10px;color:#e0e0ff;margin-bottom:10px;">
+            <span style="color:#9d96ff;font-size:9px;display:block;margin-bottom:3px;">POLISHED</span>
+            Could you assist me in understanding this concept? I'd appreciate a clear explanation.
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button style="background:#6c63ff;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Apply</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Copy</button>
+            <button style="background:transparent;color:#9d96ff;border:1px solid #9d96ff;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;">Edit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Inline expansion (shows original vs polished)</h3>
+      <p>Panel expands inline near the input, showing both original and polished side-by-side. No overlay — context is always visible.</p>
+    </div>
+  </div>
+</div>
