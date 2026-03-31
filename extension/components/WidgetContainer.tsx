@@ -171,7 +171,6 @@ export function WidgetContainer({ onContainerReady }: WidgetContainerProps) {
   };
 
   const handleApply = (text: string) => {
-    if (!adapter) return;
     adapter.setText(text);
     setPopupOpen(false);
   };
