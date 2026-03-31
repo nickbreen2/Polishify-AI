@@ -31,10 +31,12 @@ export function PolishPopup({ polishedText, position, onApply, onCopy, onDismiss
   const [editText, setEditText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Transition loading → result when text arrives
+  // Transition loading → result when text arrives, and back to loading when cleared
   useEffect(() => {
     if (polishedText !== null) {
       setState('result');
+    } else {
+      setState('loading');
     }
   }, [polishedText]);
 
